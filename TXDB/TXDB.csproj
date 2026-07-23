@@ -48,6 +48,10 @@
       <HintPath>..\Access\Microsoft.Xaml.Behaviors.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MySqlConnector">
+      <HintPath>..\Access\MySqlConnector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Access\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -57,10 +61,39 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers">
+      <HintPath>..\Access\System.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Diagnostics.DiagnosticSource">
+      <HintPath>..\Access\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory">
+      <HintPath>..\Access\System.Memory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>..\Access\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>..\Access\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Security" />
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>..\Access\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\Access\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Data.SQLite">
       <HintPath>..\Access\System.Data.SQLite.dll</HintPath>
       <Private>True</Private>
@@ -126,9 +159,9 @@
     <Compile Include="Data\AccessDatabaseProvider.cs" />
     <Compile Include="Data\DatabaseProviderBase.cs" />
     <Compile Include="Data\DatabaseProviderRegistry.cs" />
-    <Compile Include="Data\FactoryDatabaseProvider.cs" />
     <Compile Include="Data\IDatabaseMetadataProvider.cs" />
     <Compile Include="Data\IDatabaseProvider.cs" />
+    <Compile Include="Data\MySqlDatabaseProvider.cs" />
     <Compile Include="Data\OracleDatabaseProvider.cs" />
     <Compile Include="Data\SQLiteDatabaseProvider.cs" />
     <Compile Include="Data\SqlServerDatabaseProvider.cs" />

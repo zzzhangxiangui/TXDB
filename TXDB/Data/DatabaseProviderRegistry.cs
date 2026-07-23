@@ -16,7 +16,7 @@ namespace TXDB.Data
             new SQLiteDatabaseProvider(),
             new OracleDatabaseProvider(),
             new AccessDatabaseProvider(),
-            new FactoryDatabaseProvider(DatabaseProviderType.MySQL, "MySQL", "MySql.Data.MySqlClient")
+            new MySqlDatabaseProvider()
         };
 
         /// <summary>

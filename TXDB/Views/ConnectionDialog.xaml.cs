@@ -108,8 +108,9 @@ namespace TXDB.Views
         /// </summary>
         private void SaveControlsToProfile()
         {
+            DatabaseProviderType providerType = GetSelectedProviderType();
             Profile.Name = NameBox.Text.Trim();
-            Profile.ProviderType = GetSelectedProviderType();
+            Profile.ProviderType = providerType;
             Profile.Host = HostBox.Text.Trim();
             Profile.Port = PortBox.Text.Trim();
             Profile.DatabaseName = DatabaseBox.Text.Trim();
@@ -117,7 +118,7 @@ namespace TXDB.Views
             Profile.Password = PasswordBox.Password;
             Profile.FilePath = FilePicker.Path == null ? string.Empty : FilePicker.Path.Trim();
             Profile.RawConnectionString = RawConnectionBox.Text.Trim();
-            Profile.UseWindowsAuthentication = WindowsAuthBox.IsChecked == true;
+            Profile.UseWindowsAuthentication = providerType == DatabaseProviderType.SqlServer && WindowsAuthBox.IsChecked == true;
             Profile.SavePassword = SavePasswordBox.IsChecked == true;
         }
 
@@ -155,6 +156,12 @@ namespace TXDB.Views
             else if (providerType == DatabaseProviderType.Oracle && string.IsNullOrWhiteSpace(PortBox.Text))
             {
                 PortBox.Text = "1521";
+            }
+
+            if (providerType == DatabaseProviderType.MySQL && SameName(DatabaseBox.Text, "master"))
+            {
+                // master 是 SQL Server 的默认库名，切到 MySQL 时继续带着它会导致账号被判定没有 master 库权限。
+                DatabaseBox.Text = string.Empty;
             }
         }
 
@@ -247,7 +254,8 @@ namespace TXDB.Views
                 throw new InvalidOperationException("请输入服务器地址。");
             }
 
-            if (!Profile.UseWindowsAuthentication && string.IsNullOrWhiteSpace(Profile.UserName))
+            bool needUserName = Profile.ProviderType != DatabaseProviderType.SqlServer || !Profile.UseWindowsAuthentication;
+            if (needUserName && string.IsNullOrWhiteSpace(Profile.UserName))
             {
                 throw new InvalidOperationException("请输入用户名。");
             }
@@ -275,6 +283,14 @@ namespace TXDB.Views
             {
                 return DisplayName ?? string.Empty;
             }
+        }
+
+        /// <summary>
+        /// 使用忽略大小写方式比较界面文本。
+        /// </summary>
+        private static bool SameName(string left, string right)
+        {
+            return string.Equals(left ?? string.Empty, right ?? string.Empty, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
