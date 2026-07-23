@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data;
 using TXDB.Models;
 
@@ -42,5 +43,10 @@ namespace TXDB.Data
         /// 读取指定表或视图的分页预览数据，仅用于双击表打开的数据页。
         /// </summary>
         QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize);
+
+        /// <summary>
+        /// 按快速筛选条件读取指定表或视图的分页预览数据。
+        /// </summary>
+        QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize, IList<TableFilterCondition> filters);
     }
 }

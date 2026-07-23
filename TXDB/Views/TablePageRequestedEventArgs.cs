@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TXDB.Models;
 
 namespace TXDB.Views
@@ -29,14 +30,28 @@ namespace TXDB.Views
         public int PageSize { get; private set; }
 
         /// <summary>
+        /// 当前页请求携带的快速筛选条件。
+        /// </summary>
+        public IList<TableFilterCondition> Filters { get; private set; }
+
+        /// <summary>
         /// 初始化表预览分页请求参数。
         /// </summary>
         public TablePageRequestedEventArgs(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize)
+            : this(profile, tableNode, pageIndex, pageSize, null)
+        {
+        }
+
+        /// <summary>
+        /// 初始化带快速筛选条件的表预览分页请求参数。
+        /// </summary>
+        public TablePageRequestedEventArgs(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize, IList<TableFilterCondition> filters)
         {
             Profile = profile;
             TableNode = tableNode;
             PageIndex = pageIndex;
             PageSize = pageSize;
+            Filters = filters ?? new List<TableFilterCondition>();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Dapper;
 using TXDB.Models;
 
@@ -136,6 +137,14 @@ namespace TXDB.Data
         /// </summary>
         public virtual QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize)
         {
+            return PreviewTable(profile, tableNode, pageIndex, pageSize, null);
+        }
+
+        /// <summary>
+        /// 按快速筛选条件读取表或视图的某一页数据，供双击表打开的数据预览页使用。
+        /// </summary>
+        public virtual QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize, IList<TableFilterCondition> filters)
+        {
             if (profile == null)
             {
                 throw new InvalidOperationException("请先选择数据库连接。");
@@ -157,11 +166,13 @@ namespace TXDB.Data
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             QueryExecutionResult result = new QueryExecutionResult();
+            TableFilterSqlBuildResult filterSql = BuildTableFilterWhereClause(tableNode, filters, false);
+            DynamicParameters parameters = CreateDynamicParameters(filterSql.Parameters);
             using (IDbConnection connection = CreateConnection(previewProfile))
             {
                 connection.Open();
-                result.TotalRows = ReadTableTotalRows(connection, tableNode);
-                List<dynamic> rows = connection.Query(BuildPreviewTableSql(tableNode, safePageIndex, safePageSize)).ToList();
+                result.TotalRows = ReadTableTotalRows(connection, tableNode, filterSql.WhereClause, parameters);
+                List<dynamic> rows = connection.Query(BuildPreviewTableSql(tableNode, safePageIndex, safePageSize, filterSql.WhereClause), parameters).ToList();
                 result.Table = ConvertRowsToDataTable(rows);
             }
 
@@ -176,7 +187,15 @@ namespace TXDB.Data
         /// </summary>
         protected virtual int ReadTableTotalRows(IDbConnection connection, DatabaseObjectNode tableNode)
         {
-            object value = connection.ExecuteScalar(BuildCountTableSql(tableNode));
+            return ReadTableTotalRows(connection, tableNode, string.Empty, null);
+        }
+
+        /// <summary>
+        /// 按快速筛选条件读取表或视图的真实总行数，供分页控件显示总页数。
+        /// </summary>
+        protected virtual int ReadTableTotalRows(IDbConnection connection, DatabaseObjectNode tableNode, string whereClause, object parameters)
+        {
+            object value = connection.ExecuteScalar(BuildCountTableSql(tableNode, whereClause), parameters);
             if (value == null || value == DBNull.Value)
             {
                 return 0;
@@ -196,7 +215,15 @@ namespace TXDB.Data
         /// </summary>
         protected virtual string BuildCountTableSql(DatabaseObjectNode tableNode)
         {
-            return "SELECT COUNT(*) FROM " + QuoteTableName(tableNode);
+            return BuildCountTableSql(tableNode, string.Empty);
+        }
+
+        /// <summary>
+        /// 根据数据库方言生成带快速筛选条件的统计表总行数 SQL。
+        /// </summary>
+        protected virtual string BuildCountTableSql(DatabaseObjectNode tableNode, string whereClause)
+        {
+            return "SELECT COUNT(*) FROM " + QuoteTableName(tableNode) + NormalizeWhereClause(whereClause);
         }
 
         /// <summary>
@@ -242,35 +269,405 @@ namespace TXDB.Data
         /// </summary>
         protected virtual string BuildPreviewTableSql(DatabaseObjectNode tableNode, int pageIndex, int pageSize)
         {
+            return BuildPreviewTableSql(tableNode, pageIndex, pageSize, string.Empty);
+        }
+
+        /// <summary>
+        /// 根据数据库方言生成带快速筛选条件的表预览分页 SQL。
+        /// </summary>
+        protected virtual string BuildPreviewTableSql(DatabaseObjectNode tableNode, int pageIndex, int pageSize, string whereClause)
+        {
             int offset = Math.Max(0, (pageIndex - 1) * pageSize);
             string tableName = QuoteTableName(tableNode);
+            string safeWhereClause = NormalizeWhereClause(whereClause);
 
             if (ProviderType == DatabaseProviderType.SqlServer)
             {
                 if (pageIndex <= 1)
                 {
-                    return "SELECT TOP " + pageSize + " *\r\nFROM " + tableName;
+                    return "SELECT TOP " + pageSize + " *\r\nFROM " + tableName + safeWhereClause;
                 }
 
-                return "SELECT *\r\nFROM " + tableName + "\r\nORDER BY " + BuildPreviewOrderBy(tableNode) + "\r\nOFFSET " + offset + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
+                return "SELECT *\r\nFROM " + tableName + safeWhereClause + "\r\nORDER BY " + BuildPreviewOrderBy(tableNode) + "\r\nOFFSET " + offset + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
             }
 
             if (ProviderType == DatabaseProviderType.Oracle)
             {
                 if (pageIndex <= 1)
                 {
-                    return "SELECT *\r\nFROM " + tableName + "\r\nWHERE ROWNUM <= " + pageSize;
+                    return "SELECT *\r\nFROM " + tableName + BuildOracleFirstPageWhereClause(safeWhereClause, pageSize);
                 }
 
-                return "SELECT *\r\nFROM " + tableName + "\r\nORDER BY " + BuildPreviewOrderBy(tableNode) + "\r\nOFFSET " + offset + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
+                return "SELECT *\r\nFROM " + tableName + safeWhereClause + "\r\nORDER BY " + BuildPreviewOrderBy(tableNode) + "\r\nOFFSET " + offset + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
             }
 
             if (ProviderType == DatabaseProviderType.MySQL || ProviderType == DatabaseProviderType.SQLite)
             {
-                return "SELECT *\r\nFROM " + tableName + "\r\nLIMIT " + pageSize + " OFFSET " + offset;
+                return "SELECT *\r\nFROM " + tableName + safeWhereClause + "\r\nLIMIT " + pageSize + " OFFSET " + offset;
             }
 
-            return "SELECT *\r\nFROM " + tableName;
+            return "SELECT *\r\nFROM " + tableName + safeWhereClause;
+        }
+
+        /// <summary>
+        /// 为 Oracle 首页预览合并用户筛选条件和 ROWNUM 条件。
+        /// </summary>
+        private static string BuildOracleFirstPageWhereClause(string whereClause, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(whereClause))
+            {
+                return "\r\nWHERE ROWNUM <= " + pageSize;
+            }
+
+            return whereClause + " AND ROWNUM <= " + pageSize;
+        }
+
+        /// <summary>
+        /// 根据快速筛选条件生成 WHERE 子句和参数集合。
+        /// </summary>
+        protected virtual TableFilterSqlBuildResult BuildTableFilterWhereClause(DatabaseObjectNode tableNode, IList<TableFilterCondition> filters, bool usePositionalParameters)
+        {
+            TableFilterSqlBuildResult result = new TableFilterSqlBuildResult();
+            if (tableNode == null || filters == null || filters.Count == 0)
+            {
+                return result;
+            }
+
+            StringBuilder builder = new StringBuilder();
+            int activeCount = 0;
+            foreach (TableFilterCondition filter in filters)
+            {
+                string conditionSql = BuildSingleFilterConditionSql(tableNode, filter, result, usePositionalParameters);
+                if (string.IsNullOrWhiteSpace(conditionSql))
+                {
+                    continue;
+                }
+
+                if (activeCount > 0)
+                {
+                    builder.Append(" ").Append(NormalizeFilterLogic(filter == null ? string.Empty : filter.Logic)).Append(" ");
+                }
+
+                builder.Append("(").Append(conditionSql).Append(")");
+                activeCount++;
+            }
+
+            if (activeCount > 0)
+            {
+                result.WhereClause = "\r\nWHERE " + builder;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 根据单条筛选条件生成 SQL 片段。
+        /// </summary>
+        private string BuildSingleFilterConditionSql(DatabaseObjectNode tableNode, TableFilterCondition filter, TableFilterSqlBuildResult result, bool usePositionalParameters)
+        {
+            if (filter == null || !filter.IsEnabled || string.IsNullOrWhiteSpace(filter.ColumnName))
+            {
+                return string.Empty;
+            }
+
+            DatabaseObjectNode columnNode = FindFilterColumn(tableNode, filter.ColumnName);
+            if (columnNode == null)
+            {
+                return string.Empty;
+            }
+
+            string columnSql = QuoteColumnName(columnNode.Name);
+            string textColumnSql = BuildTextColumnExpression(columnSql);
+            string operatorCode = string.IsNullOrWhiteSpace(filter.OperatorCode) ? "Contains" : filter.OperatorCode;
+            string value = filter.Value == null ? string.Empty : filter.Value.Trim();
+            if (IsFilterValueRequired(operatorCode) && string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            if (SameName(operatorCode, "Equal"))
+            {
+                return columnSql + " = " + AddFilterParameter(result, value, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "NotEqual"))
+            {
+                return columnSql + " <> " + AddFilterParameter(result, value, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "LessThan"))
+            {
+                return columnSql + " < " + AddFilterParameter(result, value, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "LessThanOrEqual"))
+            {
+                return columnSql + " <= " + AddFilterParameter(result, value, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "GreaterThan"))
+            {
+                return columnSql + " > " + AddFilterParameter(result, value, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "GreaterThanOrEqual"))
+            {
+                return columnSql + " >= " + AddFilterParameter(result, value, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "Contains"))
+            {
+                return textColumnSql + " LIKE " + AddFilterParameter(result, BuildLikeValue(value, true, true), usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "NotContains"))
+            {
+                return textColumnSql + " NOT LIKE " + AddFilterParameter(result, BuildLikeValue(value, true, true), usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "StartsWith"))
+            {
+                return textColumnSql + " LIKE " + AddFilterParameter(result, BuildLikeValue(value, false, true), usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "NotStartsWith"))
+            {
+                return textColumnSql + " NOT LIKE " + AddFilterParameter(result, BuildLikeValue(value, false, true), usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "EndsWith"))
+            {
+                return textColumnSql + " LIKE " + AddFilterParameter(result, BuildLikeValue(value, true, false), usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "NotEndsWith"))
+            {
+                return textColumnSql + " NOT LIKE " + AddFilterParameter(result, BuildLikeValue(value, true, false), usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "IsNull"))
+            {
+                return columnSql + " IS NULL";
+            }
+
+            if (SameName(operatorCode, "IsNotNull"))
+            {
+                return columnSql + " IS NOT NULL";
+            }
+
+            if (SameName(operatorCode, "IsEmpty"))
+            {
+                return textColumnSql + " = " + AddFilterParameter(result, string.Empty, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "IsNotEmpty"))
+            {
+                return textColumnSql + " <> " + AddFilterParameter(result, string.Empty, usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "Between"))
+            {
+                IList<string> values = SplitFilterValues(value);
+                if (values.Count < 2)
+                {
+                    return string.Empty;
+                }
+
+                return columnSql + " BETWEEN " + AddFilterParameter(result, values[0], usePositionalParameters) + " AND " + AddFilterParameter(result, values[1], usePositionalParameters);
+            }
+
+            if (SameName(operatorCode, "In") || SameName(operatorCode, "NotIn"))
+            {
+                IList<string> values = SplitFilterValues(value);
+                if (values.Count == 0)
+                {
+                    return string.Empty;
+                }
+
+                List<string> placeholders = new List<string>();
+                foreach (string item in values)
+                {
+                    placeholders.Add(AddFilterParameter(result, item, usePositionalParameters));
+                }
+
+                return columnSql + (SameName(operatorCode, "NotIn") ? " NOT IN (" : " IN (") + string.Join(", ", placeholders.ToArray()) + ")";
+            }
+
+            return textColumnSql + " LIKE " + AddFilterParameter(result, BuildLikeValue(value, true, true), usePositionalParameters);
+        }
+
+        /// <summary>
+        /// 查找当前表中真实存在的字段，防止筛选列名被手工篡改后直接拼进 SQL。
+        /// </summary>
+        private static DatabaseObjectNode FindFilterColumn(DatabaseObjectNode tableNode, string columnName)
+        {
+            if (tableNode == null || string.IsNullOrWhiteSpace(columnName))
+            {
+                return null;
+            }
+
+            foreach (DatabaseObjectNode child in tableNode.Children)
+            {
+                if (child.Kind == DatabaseObjectKind.Column && SameName(child.Name, columnName))
+                {
+                    return child;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 判断筛选运算符是否必须输入筛选值。
+        /// </summary>
+        private static bool IsFilterValueRequired(string operatorCode)
+        {
+            return !SameName(operatorCode, "IsNull") &&
+                   !SameName(operatorCode, "IsNotNull") &&
+                   !SameName(operatorCode, "IsEmpty") &&
+                   !SameName(operatorCode, "IsNotEmpty");
+        }
+
+        /// <summary>
+        /// 规范化多条件之间的逻辑关系。
+        /// </summary>
+        private static string NormalizeFilterLogic(string logic)
+        {
+            return SameName(logic, "OR") ? "OR" : "AND";
+        }
+
+        /// <summary>
+        /// 将筛选值拆成列表，供介于、在列表、不在列表等运算符使用。
+        /// </summary>
+        private static IList<string> SplitFilterValues(string value)
+        {
+            List<string> values = new List<string>();
+            string text = value ?? string.Empty;
+            string normalized = text.Replace("，", ",").Replace("；", ",").Replace(";", ",").Replace("\r", "\n");
+            foreach (string item in normalized.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string safeItem = item.Trim();
+                if (!string.IsNullOrWhiteSpace(safeItem))
+                {
+                    values.Add(safeItem);
+                }
+            }
+
+            if (values.Count < 2)
+            {
+                string upper = text.ToUpperInvariant();
+                int andIndex = upper.IndexOf(" AND ", StringComparison.Ordinal);
+                if (andIndex > 0)
+                {
+                    values.Clear();
+                    string first = text.Substring(0, andIndex).Trim();
+                    string second = text.Substring(andIndex + 5).Trim();
+                    if (!string.IsNullOrWhiteSpace(first))
+                    {
+                        values.Add(first);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(second))
+                    {
+                        values.Add(second);
+                    }
+                }
+            }
+
+            return values;
+        }
+
+        /// <summary>
+        /// 根据数据库类型生成 LIKE 查询的文本化字段表达式。
+        /// </summary>
+        protected virtual string BuildTextColumnExpression(string quotedColumnName)
+        {
+            if (ProviderType == DatabaseProviderType.SqlServer)
+            {
+                return "CONVERT(NVARCHAR(MAX), " + quotedColumnName + ")";
+            }
+
+            if (ProviderType == DatabaseProviderType.MySQL)
+            {
+                return "CAST(" + quotedColumnName + " AS CHAR)";
+            }
+
+            if (ProviderType == DatabaseProviderType.SQLite)
+            {
+                return "CAST(" + quotedColumnName + " AS TEXT)";
+            }
+
+            if (ProviderType == DatabaseProviderType.Oracle)
+            {
+                return "TO_CHAR(" + quotedColumnName + ")";
+            }
+
+            if (ProviderType == DatabaseProviderType.Access)
+            {
+                return "(" + quotedColumnName + " & '')";
+            }
+
+            return quotedColumnName;
+        }
+
+        /// <summary>
+        /// 根据数据库类型生成 LIKE 参数值。
+        /// </summary>
+        protected virtual string BuildLikeValue(string value, bool startsWithWildcard, bool endsWithWildcard)
+        {
+            string wildcard = "%";
+            string safeValue = value ?? string.Empty;
+            return (startsWithWildcard ? wildcard : string.Empty) + safeValue + (endsWithWildcard ? wildcard : string.Empty);
+        }
+
+        /// <summary>
+        /// 新增一个筛选参数，并返回当前数据库 SQL 中对应的占位符。
+        /// </summary>
+        private string AddFilterParameter(TableFilterSqlBuildResult result, object value, bool usePositionalParameters)
+        {
+            string parameterName = "FilterValue" + result.Parameters.Count;
+            result.Parameters.Add(new TableFilterParameter(parameterName, value));
+            if (usePositionalParameters)
+            {
+                return "?";
+            }
+
+            return GetSqlParameterPrefix() + parameterName;
+        }
+
+        /// <summary>
+        /// 获取当前数据库方言的参数前缀。
+        /// </summary>
+        private string GetSqlParameterPrefix()
+        {
+            return ProviderType == DatabaseProviderType.Oracle ? ":" : "@";
+        }
+
+        /// <summary>
+        /// 将通用参数集合转换成 Dapper 可识别的参数对象。
+        /// </summary>
+        private static DynamicParameters CreateDynamicParameters(IList<TableFilterParameter> parameters)
+        {
+            DynamicParameters dynamicParameters = new DynamicParameters();
+            if (parameters == null)
+            {
+                return dynamicParameters;
+            }
+
+            foreach (TableFilterParameter parameter in parameters)
+            {
+                dynamicParameters.Add(parameter.Name, parameter.Value);
+            }
+
+            return dynamicParameters;
+        }
+
+        /// <summary>
+        /// 规范化 WHERE 子句，避免拼接出多余空白。
+        /// </summary>
+        protected static string NormalizeWhereClause(string whereClause)
+        {
+            return string.IsNullOrWhiteSpace(whereClause) ? string.Empty : whereClause;
         }
 
         /// <summary>
@@ -443,6 +840,56 @@ namespace TXDB.Data
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 表快速筛选生成后的 WHERE 子句和参数集合。
+        /// </summary>
+        protected class TableFilterSqlBuildResult
+        {
+            /// <summary>
+            /// WHERE 子句，空字符串表示没有启用筛选。
+            /// </summary>
+            public string WhereClause { get; set; }
+
+            /// <summary>
+            /// 参数集合，顺序与 SQL 中占位符出现顺序一致。
+            /// </summary>
+            public IList<TableFilterParameter> Parameters { get; private set; }
+
+            /// <summary>
+            /// 初始化筛选 SQL 构造结果。
+            /// </summary>
+            public TableFilterSqlBuildResult()
+            {
+                WhereClause = string.Empty;
+                Parameters = new List<TableFilterParameter>();
+            }
+        }
+
+        /// <summary>
+        /// 表快速筛选 SQL 参数。
+        /// </summary>
+        protected class TableFilterParameter
+        {
+            /// <summary>
+            /// 参数名称。
+            /// </summary>
+            public string Name { get; private set; }
+
+            /// <summary>
+            /// 参数值。
+            /// </summary>
+            public object Value { get; private set; }
+
+            /// <summary>
+            /// 初始化筛选参数。
+            /// </summary>
+            public TableFilterParameter(string name, object value)
+            {
+                Name = name;
+                Value = value;
+            }
         }
 
         /// <summary>

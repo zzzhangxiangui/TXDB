@@ -204,6 +204,14 @@ namespace TXDB.Data
         /// </summary>
         public override QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize)
         {
+            return PreviewTable(profile, tableNode, pageIndex, pageSize, null);
+        }
+
+        /// <summary>
+        /// 使用 OleDbDataAdapter 按起始记录读取带快速筛选条件的 Access 表预览页。
+        /// </summary>
+        public override QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize, IList<TableFilterCondition> filters)
+        {
             if (profile == null)
             {
                 throw new InvalidOperationException("请先选择数据库连接。");
@@ -219,26 +227,33 @@ namespace TXDB.Data
             int offset = System.Math.Max(0, (safePageIndex - 1) * safePageSize);
             Stopwatch stopwatch = Stopwatch.StartNew();
             QueryExecutionResult result = new QueryExecutionResult();
+            TableFilterSqlBuildResult filterSql = BuildTableFilterWhereClause(tableNode, filters, true);
+            string tableName = QuoteAccessName(tableNode.Name);
 
             string previewSql = safePageIndex <= 1
-                ? "SELECT TOP " + safePageSize + " * FROM " + QuoteAccessName(tableNode.Name)
-                : "SELECT * FROM " + QuoteAccessName(tableNode.Name);
+                ? "SELECT TOP " + safePageSize + " * FROM " + tableName + NormalizeWhereClause(filterSql.WhereClause)
+                : "SELECT * FROM " + tableName + NormalizeWhereClause(filterSql.WhereClause);
 
             using (OleDbConnection connection = OpenAccessConnection(profile))
             {
-                using (OleDbCommand countCommand = new OleDbCommand("SELECT COUNT(*) FROM " + QuoteAccessName(tableNode.Name), connection))
+                using (OleDbCommand countCommand = new OleDbCommand("SELECT COUNT(*) FROM " + tableName + NormalizeWhereClause(filterSql.WhereClause), connection))
                 {
+                    AddOleDbParameters(countCommand, filterSql.Parameters);
                     object countValue = countCommand.ExecuteScalar();
                     result.TotalRows = countValue == null || countValue == DBNull.Value ? 0 : Convert.ToInt32(countValue);
                 }
 
-                using (OleDbDataAdapter adapter = new OleDbDataAdapter(previewSql, connection))
+                using (OleDbCommand previewCommand = new OleDbCommand(previewSql, connection))
                 {
-                    DataSet dataSet = new DataSet();
-                    adapter.Fill(dataSet, safePageIndex <= 1 ? 0 : offset, safePageSize, "Result");
-                    if (dataSet.Tables.Count > 0)
+                    AddOleDbParameters(previewCommand, filterSql.Parameters);
+                    using (OleDbDataAdapter adapter = new OleDbDataAdapter(previewCommand))
                     {
-                        result.Table = dataSet.Tables[0];
+                        DataSet dataSet = new DataSet();
+                        adapter.Fill(dataSet, safePageIndex <= 1 ? 0 : offset, safePageSize, "Result");
+                        if (dataSet.Tables.Count > 0)
+                        {
+                            result.Table = dataSet.Tables[0];
+                        }
                     }
                 }
             }
@@ -247,6 +262,25 @@ namespace TXDB.Data
             result.Duration = stopwatch.Elapsed;
             result.Message = "已加载第 " + safePageIndex + " 页，返回 " + (result.Table == null ? 0 : result.Table.Rows.Count) + " 行，共 " + result.TotalRows + " 行。";
             return result;
+        }
+
+        /// <summary>
+        /// 按顺序添加 OleDb 位置参数，Access 查询中的问号占位符依赖添加顺序。
+        /// </summary>
+        private static void AddOleDbParameters(OleDbCommand command, IList<TableFilterParameter> parameters)
+        {
+            if (command == null || parameters == null)
+            {
+                return;
+            }
+
+            foreach (TableFilterParameter parameter in parameters)
+            {
+                OleDbParameter oleDbParameter = command.CreateParameter();
+                oleDbParameter.ParameterName = parameter.Name;
+                oleDbParameter.Value = parameter.Value ?? DBNull.Value;
+                command.Parameters.Add(oleDbParameter);
+            }
         }
 
         /// <summary>

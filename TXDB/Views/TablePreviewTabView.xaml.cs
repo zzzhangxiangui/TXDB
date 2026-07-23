@@ -1,11 +1,13 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Win32;
 using TX.WpfUI.Controls;
 using TXDB.Models;
@@ -18,6 +20,10 @@ namespace TXDB.Views
     public partial class TablePreviewTabView : UserControl
     {
         private readonly IList<int> pageSizeOptions;
+        private readonly ObservableCollection<TableFilterCondition> filterConditions;
+        private readonly ObservableCollection<string> filterColumnOptions;
+        private readonly IList<string> filterLogicOptions;
+        private readonly IList<TableFilterOperatorOption> filterOperatorOptions;
         private DataTable resultTable;
         private bool isUpdatingPagination;
         private bool isLoading;
@@ -49,16 +55,54 @@ namespace TXDB.Views
         public int PageSize { get; private set; }
 
         /// <summary>
+        /// 界面绑定的筛选条件集合。
+        /// </summary>
+        public ObservableCollection<TableFilterCondition> FilterConditions
+        {
+            get { return filterConditions; }
+        }
+
+        /// <summary>
+        /// 界面绑定的筛选字段下拉列表。
+        /// </summary>
+        public ObservableCollection<string> FilterColumnOptions
+        {
+            get { return filterColumnOptions; }
+        }
+
+        /// <summary>
+        /// 界面绑定的 AND/OR 逻辑下拉列表。
+        /// </summary>
+        public IList<string> FilterLogicOptions
+        {
+            get { return filterLogicOptions; }
+        }
+
+        /// <summary>
+        /// 界面绑定的筛选运算符下拉列表。
+        /// </summary>
+        public IList<TableFilterOperatorOption> FilterOperatorOptions
+        {
+            get { return filterOperatorOptions; }
+        }
+
+        /// <summary>
         /// 初始化表预览页。
         /// </summary>
         public TablePreviewTabView()
         {
+            filterConditions = new ObservableCollection<TableFilterCondition>();
+            filterColumnOptions = new ObservableCollection<string>();
+            filterLogicOptions = new List<string> { "AND", "OR" };
+            filterOperatorOptions = BuildFilterOperatorOptions();
             InitializeComponent();
             pageSizeOptions = new List<int> { 100, 200, 500, 1000, 10000 };
             PageIndex = 1;
             PageSize = 100;
             totalRows = 0;
             ResultGridHelper.Configure(ResultGrid);
+            EnsureDefaultFilterCondition();
+            UpdateFilterSummary();
             InitializePaginationControl();
         }
 
@@ -72,6 +116,9 @@ namespace TXDB.Views
             PageIndex = 1;
             totalRows = 0;
             TableNameText.Text = BuildTableDisplayName(tableNode);
+            RefreshFilterColumnOptions();
+            ResetInvalidFilterColumns();
+            UpdateFilterSummary();
             UpdatePageState();
         }
 
@@ -86,7 +133,8 @@ namespace TXDB.Views
             }
 
             SetLoading(true);
-            MessageText.Text = "正在加载第 " + PageIndex + " 页...";
+            IList<TableFilterCondition> activeFilters = GetActiveFilters();
+            MessageText.Text = "正在加载第 " + PageIndex + " 页" + (activeFilters.Count > 0 ? "，已启用筛选..." : "...");
             EventHandler<TablePageRequestedEventArgs> handler = PageRequested;
             if (handler == null)
             {
@@ -95,7 +143,7 @@ namespace TXDB.Views
                 return;
             }
 
-            handler(this, new TablePageRequestedEventArgs(Profile.Clone(), TableNode, PageIndex, PageSize));
+            handler(this, new TablePageRequestedEventArgs(Profile.Clone(), TableNode, PageIndex, PageSize, activeFilters));
         }
 
         /// <summary>
@@ -109,6 +157,7 @@ namespace TXDB.Views
             totalRows = result != null && result.TotalRows >= 0 ? result.TotalRows : rowCount;
             MessageText.Text = result == null ? "无执行结果" : result.Message + " 耗时：" + result.Duration.TotalMilliseconds.ToString("0") + " ms";
             SetLoading(false);
+            UpdateFilterSummary();
             UpdatePageState();
             UpdateSelectionStatus();
         }
@@ -120,6 +169,7 @@ namespace TXDB.Views
         {
             MessageText.Text = message ?? string.Empty;
             SetLoading(false);
+            UpdateFilterSummary();
             UpdatePageState();
             UpdateSelectionStatus();
         }
@@ -254,12 +304,126 @@ namespace TXDB.Views
         }
 
         /// <summary>
+        /// 展开或收起快速筛选面板。
+        /// </summary>
+        private void FilterToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (FilterPanel.Visibility == Visibility.Visible)
+            {
+                CloseFilterPanelAndClearFilter();
+                return;
+            }
+
+            FilterPanel.Visibility = Visibility.Visible;
+            FilterToggleButton.Content = "关闭筛选";
+        }
+
+        /// <summary>
+        /// 新增一条快速筛选条件。
+        /// </summary>
+        private void AddFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            filterConditions.Add(CreateDefaultFilterCondition());
+            UpdateFilterSummary();
+        }
+
+        /// <summary>
+        /// 应用当前快速筛选条件，并回到第一页重新加载数据。
+        /// </summary>
+        private void ApplyFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFilterAndReload();
+        }
+
+        /// <summary>
+        /// 清空快速筛选条件，并重新加载未筛选的数据。
+        /// </summary>
+        private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetFilterConditions();
+            ApplyFilterAndReload();
+        }
+
+        /// <summary>
+        /// 删除当前筛选条件行。
+        /// </summary>
+        private void RemoveFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement element = sender as FrameworkElement;
+            TableFilterCondition condition = element == null ? null : element.Tag as TableFilterCondition;
+            if (condition != null)
+            {
+                filterConditions.Remove(condition);
+            }
+
+            EnsureDefaultFilterCondition();
+            UpdateFilterSummary();
+        }
+
+        /// <summary>
+        /// 在筛选值输入框中按回车时直接应用筛选。
+        /// </summary>
+        private void FilterValueBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Return)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            ApplyFilterAndReload();
+        }
+
+        /// <summary>
+        /// 应用筛选并回到第一页重新请求数据。
+        /// </summary>
+        private void ApplyFilterAndReload()
+        {
+            if (isLoading)
+            {
+                return;
+            }
+
+            PageIndex = 1;
+            UpdateFilterSummary();
+            UpdatePageState();
+            RequestPage();
+        }
+
+        /// <summary>
+        /// 关闭筛选面板时同步取消筛选，避免只是隐藏界面但数据仍处于筛选状态。
+        /// </summary>
+        private void CloseFilterPanelAndClearFilter()
+        {
+            bool needReload = GetActiveFilters().Count > 0;
+            FilterPanel.Visibility = Visibility.Collapsed;
+            FilterToggleButton.Content = "筛选";
+            ResetFilterConditions();
+            UpdateFilterSummary();
+            if (needReload)
+            {
+                ApplyFilterAndReload();
+            }
+        }
+
+        /// <summary>
+        /// 重置快速筛选条件到一条默认空白条件。
+        /// </summary>
+        private void ResetFilterConditions()
+        {
+            filterConditions.Clear();
+            EnsureDefaultFilterCondition();
+        }
+
+        /// <summary>
         /// 设置加载状态，避免重复翻页请求。
         /// </summary>
         private void SetLoading(bool loading)
         {
             isLoading = loading;
             PaginationControl.IsEnabled = !loading;
+            FilterToggleButton.IsEnabled = !loading;
+            FilterPanel.IsEnabled = !loading;
         }
 
         /// <summary>
@@ -279,6 +443,178 @@ namespace TXDB.Views
             {
                 isUpdatingPagination = false;
             }
+        }
+
+        /// <summary>
+        /// 根据当前表元数据刷新筛选字段下拉选项。
+        /// </summary>
+        private void RefreshFilterColumnOptions()
+        {
+            filterColumnOptions.Clear();
+            if (TableNode == null)
+            {
+                return;
+            }
+
+            foreach (DatabaseObjectNode child in TableNode.Children)
+            {
+                if (child.Kind == DatabaseObjectKind.Column &&
+                    !string.IsNullOrWhiteSpace(child.Name) &&
+                    !FilterColumnExists(child.Name))
+                {
+                    filterColumnOptions.Add(child.Name);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 确保筛选条件至少保留一条空白行，便于用户直接编辑。
+        /// </summary>
+        private void EnsureDefaultFilterCondition()
+        {
+            if (filterConditions.Count == 0)
+            {
+                filterConditions.Add(CreateDefaultFilterCondition());
+            }
+        }
+
+        /// <summary>
+        /// 创建一条默认筛选条件。
+        /// </summary>
+        private TableFilterCondition CreateDefaultFilterCondition()
+        {
+            return new TableFilterCondition
+            {
+                IsEnabled = true,
+                Logic = "AND",
+                ColumnName = filterColumnOptions.Count > 0 ? filterColumnOptions[0] : string.Empty,
+                OperatorCode = "Contains",
+                Value = string.Empty
+            };
+        }
+
+        /// <summary>
+        /// 当前表字段变化后重置不存在的筛选字段。
+        /// </summary>
+        private void ResetInvalidFilterColumns()
+        {
+            foreach (TableFilterCondition condition in filterConditions)
+            {
+                if (!IsKnownFilterColumn(condition.ColumnName))
+                {
+                    condition.ColumnName = filterColumnOptions.Count > 0 ? filterColumnOptions[0] : string.Empty;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取当前可以真正下发到数据库的活动筛选条件。
+        /// </summary>
+        private IList<TableFilterCondition> GetActiveFilters()
+        {
+            List<TableFilterCondition> activeFilters = new List<TableFilterCondition>();
+            foreach (TableFilterCondition condition in filterConditions)
+            {
+                if (condition == null || !condition.IsEnabled || !IsKnownFilterColumn(condition.ColumnName))
+                {
+                    continue;
+                }
+
+                if (IsFilterValueRequired(condition.OperatorCode) && string.IsNullOrWhiteSpace(condition.Value))
+                {
+                    continue;
+                }
+
+                activeFilters.Add(condition.Clone());
+            }
+
+            return activeFilters;
+        }
+
+        /// <summary>
+        /// 刷新顶部筛选状态文本。
+        /// </summary>
+        private void UpdateFilterSummary()
+        {
+            int activeCount = GetActiveFilters().Count;
+            FilterSummaryText.Text = activeCount <= 0 ? string.Empty : "已筛选 " + activeCount + " 条";
+        }
+
+        /// <summary>
+        /// 判断筛选列下拉中是否已经存在指定字段。
+        /// </summary>
+        private bool FilterColumnExists(string columnName)
+        {
+            foreach (string item in filterColumnOptions)
+            {
+                if (SameName(item, columnName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 判断当前筛选字段是否属于当前表字段。
+        /// </summary>
+        private bool IsKnownFilterColumn(string columnName)
+        {
+            if (string.IsNullOrWhiteSpace(columnName))
+            {
+                return false;
+            }
+
+            foreach (string item in filterColumnOptions)
+            {
+                if (SameName(item, columnName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 判断当前运算符是否必须输入筛选值。
+        /// </summary>
+        private static bool IsFilterValueRequired(string operatorCode)
+        {
+            return !SameName(operatorCode, "IsNull") &&
+                   !SameName(operatorCode, "IsNotNull") &&
+                   !SameName(operatorCode, "IsEmpty") &&
+                   !SameName(operatorCode, "IsNotEmpty");
+        }
+
+        /// <summary>
+        /// 构造快速筛选运算符列表。
+        /// </summary>
+        private static IList<TableFilterOperatorOption> BuildFilterOperatorOptions()
+        {
+            return new List<TableFilterOperatorOption>
+            {
+                new TableFilterOperatorOption { OperatorCode = "Equal", DisplayName = "=" },
+                new TableFilterOperatorOption { OperatorCode = "NotEqual", DisplayName = "!=" },
+                new TableFilterOperatorOption { OperatorCode = "LessThan", DisplayName = "<" },
+                new TableFilterOperatorOption { OperatorCode = "LessThanOrEqual", DisplayName = "<=" },
+                new TableFilterOperatorOption { OperatorCode = "GreaterThan", DisplayName = ">" },
+                new TableFilterOperatorOption { OperatorCode = "GreaterThanOrEqual", DisplayName = ">=" },
+                new TableFilterOperatorOption { OperatorCode = "Contains", DisplayName = "包含" },
+                new TableFilterOperatorOption { OperatorCode = "NotContains", DisplayName = "不包含" },
+                new TableFilterOperatorOption { OperatorCode = "StartsWith", DisplayName = "开始以" },
+                new TableFilterOperatorOption { OperatorCode = "NotStartsWith", DisplayName = "开始不是以" },
+                new TableFilterOperatorOption { OperatorCode = "EndsWith", DisplayName = "结束以" },
+                new TableFilterOperatorOption { OperatorCode = "NotEndsWith", DisplayName = "结束不是以" },
+                new TableFilterOperatorOption { OperatorCode = "IsNull", DisplayName = "是 null" },
+                new TableFilterOperatorOption { OperatorCode = "IsNotNull", DisplayName = "不是 null" },
+                new TableFilterOperatorOption { OperatorCode = "IsEmpty", DisplayName = "是空的" },
+                new TableFilterOperatorOption { OperatorCode = "IsNotEmpty", DisplayName = "不是空的" },
+                new TableFilterOperatorOption { OperatorCode = "Between", DisplayName = "介于" },
+                new TableFilterOperatorOption { OperatorCode = "In", DisplayName = "在列表" },
+                new TableFilterOperatorOption { OperatorCode = "NotIn", DisplayName = "不在列表" }
+            };
         }
 
         /// <summary>

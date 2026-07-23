@@ -1799,7 +1799,7 @@ namespace TXDB
             try
             {
                 IDatabaseProvider provider = DatabaseProviderRegistry.GetProvider(e.Profile.ProviderType);
-                QueryExecutionResult result = await Task.Run(() => provider.PreviewTable(e.Profile, e.TableNode, e.PageIndex, e.PageSize));
+                QueryExecutionResult result = await Task.Run(() => provider.PreviewTable(e.Profile, e.TableNode, e.PageIndex, e.PageSize, e.Filters));
                 view.SetResult(result);
                 StatusText.Text = "表数据加载完成。";
             }

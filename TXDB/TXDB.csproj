@@ -180,6 +180,8 @@
     <Compile Include="Models\SqlCompletionItem.cs" />
     <Compile Include="Models\SqlKeywordHelpInfo.cs" />
     <Compile Include="Models\SqlTemplateInfo.cs" />
+    <Compile Include="Models\TableFilterCondition.cs" />
+    <Compile Include="Models\TableFilterOperatorOption.cs" />
     <Compile Include="Services\ConnectionProfileStore.cs" />
     <Compile Include="Services\NotifyObject.cs" />
     <Compile Include="Services\AppSettingsStore.cs" />
