@@ -24,16 +24,6 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Margin="8,0,0,0">
-                    <tx:TXButton x:Name="FormatButton" Content="格式化" ButtonSize="Small" Margin="6,0,0,0" Click="FormatButton_Click" MinWidth="82">
-                        <tx:TXButton.Icon>
-                            <tx:TXIcon Source="{StaticResource TX.Icon.编辑}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
-                        </tx:TXButton.Icon>
-                    </tx:TXButton>
-                    <tx:TXButton x:Name="SaveQueryButton" Content="保存" ButtonType="Primary" ButtonSize="Small" Margin="6,0,0,0" Click="SaveQueryButton_Click" MinWidth="70">
-                        <tx:TXButton.Icon>
-                            <tx:TXIcon Source="{StaticResource TX.Icon.保存}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
-                        </tx:TXButton.Icon>
-                    </tx:TXButton>
                     <tx:TXButton x:Name="ExecuteButton" Content="运行" ButtonType="Success" ButtonSize="Small" Margin="6,0,0,0" Click="ExecuteButton_Click" MinWidth="82" LoadingContent="执行中">
                         <tx:TXButton.Icon>
                             <tx:TXIcon Source="{StaticResource TX.Icon.播放}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
@@ -42,6 +32,16 @@
                     <tx:TXButton x:Name="StopButton" Content="停止" ButtonSize="Small" Margin="6,0,0,0" Click="StopButton_Click" IsEnabled="False" MinWidth="70">
                         <tx:TXButton.Icon>
                             <tx:TXIcon Source="{StaticResource TX.Icon.停止}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="FormatButton" Content="格式化" ButtonSize="Small" Margin="6,0,0,0" Click="FormatButton_Click" MinWidth="82">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.编辑}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="SaveQueryButton" Content="保存" ButtonType="Primary" ButtonSize="Small" Margin="6,0,0,0" Click="SaveQueryButton_Click" MinWidth="70">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.保存}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
                         </tx:TXButton.Icon>
                     </tx:TXButton>
                     <tx:TXButton x:Name="ExportButton" Content="导出" ButtonSize="Small" Margin="6,0,0,0" Click="ExportButton_Click" MinWidth="70">
@@ -153,7 +153,7 @@
                            VirtualizingPanel.VirtualizationMode="Recycling"
                            ScrollViewer.CanContentScroll="True"
                            ScrollViewer.IsDeferredScrollingEnabled="False"
-                           CanUserSortColumns="True"
+                           CanUserSortColumns="False"
                            CurrentCellChanged="ResultGrid_CurrentCellChanged"
                            SelectedCellsChanged="ResultGrid_SelectedCellsChanged"
                            GridLinesVisibility="Horizontal"

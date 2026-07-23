@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -18,7 +19,7 @@ namespace TXDB.Views
     public static class ResultGridHelper
     {
         private const double DefaultResultColumnWidth = 160d;
-        private const double MaxResultColumnWidth = 360d;
+        private const double MaxResultColumnWidth = 720d;
 
         private static readonly Style ResultTextElementStyle = CreateResultTextElementStyle();
 
@@ -37,6 +38,7 @@ namespace TXDB.Views
             grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
             grid.CanUserResizeColumns = true;
             grid.CanUserReorderColumns = true;
+            grid.CanUserSortColumns = false;
             grid.EnableRowVirtualization = true;
             grid.EnableColumnVirtualization = true;
             grid.ColumnWidth = new DataGridLength(DefaultResultColumnWidth);
@@ -64,6 +66,7 @@ namespace TXDB.Views
             TXDataGridTextColumn column = new TXDataGridTextColumn();
             column.Header = columnName;
             column.SortMemberPath = columnName;
+            column.CanUserSort = false;
             column.MinWidth = 70;
             column.MaxWidth = MaxResultColumnWidth;
             column.Width = new DataGridLength(DefaultResultColumnWidth);
@@ -137,43 +140,11 @@ namespace TXDB.Views
         }
 
         /// <summary>
-        /// 自定义 DataView 排序，避免特殊字段名触发表头点击异常。
+        /// 拦截列头默认点击排序，排序只允许通过列头右键菜单显式触发。
         /// </summary>
         private static void ResultGrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
-            TXDataGrid grid = sender as TXDataGrid;
-            DataView view = grid == null ? null : grid.ItemsSource as DataView;
             e.Handled = true;
-
-            if (grid == null || view == null || e.Column == null)
-            {
-                return;
-            }
-
-            string columnName = Convert.ToString(e.Column.Header, CultureInfo.CurrentCulture);
-            if (string.IsNullOrWhiteSpace(columnName) || view.Table == null || !view.Table.Columns.Contains(columnName))
-            {
-                return;
-            }
-
-            try
-            {
-                ListSortDirection direction = e.Column.SortDirection == ListSortDirection.Ascending
-                    ? ListSortDirection.Descending
-                    : ListSortDirection.Ascending;
-
-                foreach (DataGridColumn column in grid.Columns)
-                {
-                    column.SortDirection = null;
-                }
-
-                view.Sort = EscapeDataViewSortColumnName(columnName) + (direction == ListSortDirection.Ascending ? " ASC" : " DESC");
-                e.Column.SortDirection = direction;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(Window.GetWindow(grid), "排序失败：" + ex.Message, "TXDB", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
         }
 
         /// <summary>
@@ -234,6 +205,14 @@ namespace TXDB.Views
         private static void ResultGrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             TXDataGrid grid = sender as TXDataGrid;
+            DataGridColumnHeader header = FindParent<DataGridColumnHeader>(e.OriginalSource as DependencyObject);
+            if (grid != null && header != null && header.Column != null)
+            {
+                ShowColumnHeaderContextMenu(grid, header.Column);
+                e.Handled = true;
+                return;
+            }
+
             DataGridCell cell = FindParent<DataGridCell>(e.OriginalSource as DependencyObject);
             if (grid == null || cell == null)
             {
@@ -250,6 +229,55 @@ namespace TXDB.Views
             grid.CurrentCell = new DataGridCellInfo(row.Item, cell.Column);
             grid.SelectedCells.Add(grid.CurrentCell);
             cell.Focus();
+        }
+
+        /// <summary>
+        /// 显示列头右键排序菜单，把排序动作变成用户明确选择。
+        /// </summary>
+        private static void ShowColumnHeaderContextMenu(TXDataGrid grid, DataGridColumn column)
+        {
+            ContextMenu menu = new ContextMenu();
+            SortMenuContext context = new SortMenuContext(grid, column);
+            menu.Tag = context;
+            menu.PlacementTarget = grid;
+            menu.Placement = PlacementMode.MousePoint;
+
+            MenuItem ascendingItem = CreateSortMenuItem("升序排序", ListSortDirection.Ascending);
+            MenuItem descendingItem = CreateSortMenuItem("降序排序", ListSortDirection.Descending);
+            MenuItem removeItem = CreateRemoveSortMenuItem();
+            bool canSort = CanSortColumn(grid, column);
+            ascendingItem.IsEnabled = canSort;
+            descendingItem.IsEnabled = canSort;
+            removeItem.IsEnabled = canSort && HasActiveSort(grid);
+
+            menu.Items.Add(ascendingItem);
+            menu.Items.Add(descendingItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(removeItem);
+            menu.IsOpen = true;
+        }
+
+        /// <summary>
+        /// 创建升序或降序排序菜单项。
+        /// </summary>
+        private static MenuItem CreateSortMenuItem(string header, ListSortDirection direction)
+        {
+            MenuItem item = new MenuItem();
+            item.Header = header;
+            item.Tag = direction;
+            item.Click += SortColumnMenuItem_Click;
+            return item;
+        }
+
+        /// <summary>
+        /// 创建移除排序菜单项。
+        /// </summary>
+        private static MenuItem CreateRemoveSortMenuItem()
+        {
+            MenuItem item = new MenuItem();
+            item.Header = "移除排序";
+            item.Click += RemoveSortMenuItem_Click;
+            return item;
         }
 
         /// <summary>
@@ -304,6 +332,122 @@ namespace TXDB.Views
         }
 
         /// <summary>
+        /// 执行列头右键菜单中的升序或降序排序。
+        /// </summary>
+        private static void SortColumnMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            SortMenuContext context = GetSortContextFromMenuItem(item);
+            if (context == null || !(item.Tag is ListSortDirection))
+            {
+                return;
+            }
+
+            ApplyColumnSort(context.Grid, context.Column, (ListSortDirection)item.Tag);
+        }
+
+        /// <summary>
+        /// 移除当前结果表格的排序，恢复原始结果顺序。
+        /// </summary>
+        private static void RemoveSortMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SortMenuContext context = GetSortContextFromMenuItem(sender as MenuItem);
+            if (context == null)
+            {
+                return;
+            }
+
+            ApplyColumnSort(context.Grid, context.Column, null);
+        }
+
+        /// <summary>
+        /// 对 DataView 应用排序或清除排序。
+        /// </summary>
+        private static void ApplyColumnSort(TXDataGrid grid, DataGridColumn column, ListSortDirection? direction)
+        {
+            DataView view = grid == null ? null : grid.ItemsSource as DataView;
+            if (grid == null || view == null)
+            {
+                return;
+            }
+
+            try
+            {
+                foreach (DataGridColumn gridColumn in grid.Columns)
+                {
+                    gridColumn.SortDirection = null;
+                }
+
+                if (!direction.HasValue)
+                {
+                    view.Sort = string.Empty;
+                    return;
+                }
+
+                string columnName = GetColumnHeaderText(column);
+                if (string.IsNullOrWhiteSpace(columnName) || view.Table == null || !view.Table.Columns.Contains(columnName))
+                {
+                    return;
+                }
+
+                view.Sort = EscapeDataViewSortColumnName(columnName) + (direction.Value == ListSortDirection.Ascending ? " ASC" : " DESC");
+                column.SortDirection = direction.Value;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Window.GetWindow(grid), "排序失败：" + ex.Message, "TXDB", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        /// <summary>
+        /// 判断当前列是否可以排序，避免非数据列或异常字段触发错误。
+        /// </summary>
+        private static bool CanSortColumn(TXDataGrid grid, DataGridColumn column)
+        {
+            DataView view = grid == null ? null : grid.ItemsSource as DataView;
+            string columnName = GetColumnHeaderText(column);
+            return view != null &&
+                   view.Table != null &&
+                   !string.IsNullOrWhiteSpace(columnName) &&
+                   view.Table.Columns.Contains(columnName);
+        }
+
+        /// <summary>
+        /// 判断当前表格是否已经存在排序。
+        /// </summary>
+        private static bool HasActiveSort(TXDataGrid grid)
+        {
+            DataView view = grid == null ? null : grid.ItemsSource as DataView;
+            if (view != null && !string.IsNullOrWhiteSpace(view.Sort))
+            {
+                return true;
+            }
+
+            if (grid == null)
+            {
+                return false;
+            }
+
+            foreach (DataGridColumn column in grid.Columns)
+            {
+                if (column.SortDirection.HasValue)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 读取列头显示文本作为 DataTable 字段名。
+        /// </summary>
+        private static string GetColumnHeaderText(DataGridColumn column)
+        {
+            return column == null ? string.Empty : Convert.ToString(column.Header, CultureInfo.CurrentCulture) ?? string.Empty;
+        }
+
+        /// <summary>
         /// 从菜单项反查所属结果表格。
         /// </summary>
         private static TXDataGrid GetGridFromMenuItem(MenuItem menuItem)
@@ -315,6 +459,20 @@ namespace TXDB.Views
 
             ContextMenu menu = menuItem.Parent as ContextMenu;
             return menu == null ? null : menu.PlacementTarget as TXDataGrid;
+        }
+
+        /// <summary>
+        /// 从列头排序菜单项反查表格和列。
+        /// </summary>
+        private static SortMenuContext GetSortContextFromMenuItem(MenuItem menuItem)
+        {
+            if (menuItem == null)
+            {
+                return null;
+            }
+
+            ContextMenu menu = menuItem.Parent as ContextMenu;
+            return menu == null ? null : menu.Tag as SortMenuContext;
         }
 
         /// <summary>
@@ -448,6 +606,31 @@ namespace TXDB.Views
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 列头右键排序菜单需要携带的上下文。
+        /// </summary>
+        private class SortMenuContext
+        {
+            /// <summary>
+            /// 初始化排序菜单上下文。
+            /// </summary>
+            public SortMenuContext(TXDataGrid grid, DataGridColumn column)
+            {
+                Grid = grid;
+                Column = column;
+            }
+
+            /// <summary>
+            /// 当前结果表格。
+            /// </summary>
+            public TXDataGrid Grid { get; private set; }
+
+            /// <summary>
+            /// 当前右键点击的列。
+            /// </summary>
+            public DataGridColumn Column { get; private set; }
         }
     }
 }

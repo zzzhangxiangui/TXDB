@@ -55,7 +55,7 @@
                        VirtualizingPanel.VirtualizationMode="Recycling"
                        ScrollViewer.CanContentScroll="True"
                        ScrollViewer.IsDeferredScrollingEnabled="False"
-                       CanUserSortColumns="True"
+                       CanUserSortColumns="False"
                        CurrentCellChanged="ResultGrid_CurrentCellChanged"
                        SelectedCellsChanged="ResultGrid_SelectedCellsChanged"
                        GridLinesVisibility="Horizontal"
