@@ -21,6 +21,7 @@ namespace TXDB.Views
         private const double DefaultResultColumnWidth = 160d;
         private const double MaxResultColumnWidth = 720d;
 
+        private static readonly DataTemplate ResultColumnHeaderTemplate = CreateResultColumnHeaderTemplate();
         private static readonly Style ResultTextElementStyle = CreateResultTextElementStyle();
 
         /// <summary>
@@ -65,6 +66,7 @@ namespace TXDB.Views
             string columnName = e.PropertyName;
             TXDataGridTextColumn column = new TXDataGridTextColumn();
             column.Header = columnName;
+            column.HeaderTemplate = ResultColumnHeaderTemplate;
             column.SortMemberPath = columnName;
             column.CanUserSort = false;
             column.MinWidth = 70;
@@ -88,6 +90,20 @@ namespace TXDB.Views
             style.Setters.Add(new Setter(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center));
             style.Setters.Add(new Setter(FrameworkElement.MinWidthProperty, 0d));
             return style;
+        }
+
+        /// <summary>
+        /// 创建结果表格列头模板，避免 WPF 将下划线当成访问键处理。
+        /// </summary>
+        private static DataTemplate CreateResultColumnHeaderTemplate()
+        {
+            FrameworkElementFactory textBlock = new FrameworkElementFactory(typeof(TextBlock));
+            textBlock.SetBinding(TextBlock.TextProperty, new Binding("."));
+            textBlock.SetValue(TextBlock.TextTrimmingProperty, TextTrimming.CharacterEllipsis);
+            textBlock.SetValue(TextBlock.TextWrappingProperty, TextWrapping.NoWrap);
+            textBlock.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
+            textBlock.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Left);
+            return new DataTemplate { VisualTree = textBlock };
         }
 
         /// <summary>
