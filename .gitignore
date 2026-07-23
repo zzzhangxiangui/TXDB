@@ -41,6 +41,9 @@ connections/
 settings/
 queries/
 
+# 安装包生成输出目录
+安装包制作/installation/
+
 # Windows 资源管理器文件
 Thumbs.db
 Desktop.ini
