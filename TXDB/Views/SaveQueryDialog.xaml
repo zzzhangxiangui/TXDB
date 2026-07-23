@@ -1,0 +1,70 @@
+<Window x:Class="TXDB.Views.SaveQueryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tx="clr-namespace:TX.WpfUI.Controls;assembly=TX.WpfUI"
+        Title="保存查询"
+        Width="440"
+        MinWidth="420"
+        MinHeight="270"
+        ResizeMode="NoResize"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        Icon="../Logo.ico"
+        Background="{DynamicResource TX.Brush.Background}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 弹窗顶部只说明当前动作，不暴露复杂存储细节。 -->
+        <TextBlock x:Name="HeaderText"
+                   Grid.Row="0"
+                   Text="保存当前查询语句"
+                   FontSize="18"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource TX.Brush.TextPrimary}"
+                   Margin="0,0,0,14" />
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource TX.Brush.Surface}"
+                BorderBrush="{DynamicResource TX.Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="12">
+            <StackPanel>
+                <TextBlock Text="查询名称"
+                           Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                           Margin="0,0,0,8" />
+                <tx:TXTextBox x:Name="TitleBox"
+                              Height="42"
+                              VerticalContentAlignment="Center"
+                              Watermark="例如：查询电表基础信息"
+                              ClearButtonVisibility="Visible"
+                              KeyDown="TitleBox_KeyDown" />
+                <TextBlock x:Name="ScopeText"
+                           Margin="0,10,0,0"
+                           Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                           TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <tx:TXButton Content="取消"
+                         Width="82"
+                         ButtonSize="Medium"
+                         Click="CancelButton_Click"
+                         Margin="0,0,8,0" />
+            <tx:TXButton x:Name="SaveButton"
+                         Content="保存"
+                         Width="82"
+                         ButtonType="Primary"
+                         ButtonSize="Medium"
+                         Click="SaveButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

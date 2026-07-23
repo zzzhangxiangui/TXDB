@@ -1,0 +1,4888 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TX.WpfUI</name>
+    </assembly>
+    <members>
+        <member name="T:TX.WpfUI.Controls.TXButtonType">
+            <summary>
+            按钮的语义类型，用于在样式中切换默认、主色、成功、警告、危险和文本按钮外观。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonType.Default">
+            <summary>默认按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonType.Primary">
+            <summary>主操作按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonType.Success">
+            <summary>成功或确认类按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonType.Warning">
+            <summary>警告类按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonType.Danger">
+            <summary>危险或删除类按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonType.Text">
+            <summary>文本按钮。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXButtonSize">
+            <summary>
+            按钮尺寸枚举，用于在模板中控制高度、内边距和字号。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonSize.Small">
+            <summary>小尺寸按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonSize.Medium">
+            <summary>中等尺寸按钮。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonSize.Large">
+            <summary>大尺寸按钮。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXButtonShape">
+            <summary>
+            按钮形状枚举，用于控制按钮圆角形态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonShape.Rounded">
+            <summary>常规圆角。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonShape.Square">
+            <summary>直角。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonShape.Pill">
+            <summary>胶囊形。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButtonShape.Circle">
+            <summary>圆形，通常用于纯图标按钮。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXIconPlacement">
+            <summary>
+            图标相对内容的摆放方向。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIconPlacement.Left">
+            <summary>图标在左侧。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIconPlacement.Right">
+            <summary>图标在右侧。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIconPlacement.Top">
+            <summary>图标在上方。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIconPlacement.Bottom">
+            <summary>图标在下方。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXButton">
+            <summary>
+            TX.WpfUI 的增强按钮，支持语义类型、尺寸、形状、图标和加载状态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.ButtonTypeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.ButtonType"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.CornerRadiusProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.CornerRadius"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.ButtonSizeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.ButtonSize"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.ButtonShapeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.ButtonShape"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.IconProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.Icon"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.IconPlacementProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.IconPlacement"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.IconSpacingProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.IconSpacing"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.IsLoadingProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.IsLoading"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXButton.LoadingContentProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXButton.LoadingContent"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.ButtonType">
+            <summary>
+            获取或设置按钮语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.CornerRadius">
+            <summary>
+            获取或设置按钮圆角。该属性会传入控件模板中的外层边框。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.ButtonSize">
+            <summary>
+            获取或设置按钮尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.ButtonShape">
+            <summary>
+            获取或设置按钮形状。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.Icon">
+            <summary>
+            获取或设置按钮图标内容，可以是文本、Path、Image 或任意对象。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.IconPlacement">
+            <summary>
+            获取或设置图标相对按钮内容的位置。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.IconSpacing">
+            <summary>
+            获取或设置图标与内容之间的间距。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.IsLoading">
+            <summary>
+            获取或设置按钮是否处于加载状态。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXButton.LoadingContent">
+            <summary>
+            获取或设置加载状态下展示的内容。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXIconButton">
+            <summary>
+            圆形图标按钮，默认尺寸为 32x32，适合工具栏、表格操作列等紧凑场景。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXIconButton.#ctor">
+            <summary>
+            ??? <see cref="T:TX.WpfUI.Controls.TXIconButton"/> ??????
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXComboBox">
+            <summary>
+            带水印和清除按钮的下拉框，兼容可编辑模式。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXComboBox.WatermarkProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXComboBox.Watermark"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXComboBox.ClearButtonVisibilityProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXComboBox.ClearButtonVisibility"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXComboBox.HasValueProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXComboBox.HasValue"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXComboBox.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXComboBox"/> 的新实例，并监听文本与选择变化。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXComboBox.Watermark">
+            <summary>
+            获取或设置未选择时显示的水印内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXComboBox.ClearButtonVisibility">
+            <summary>
+            获取或设置清除按钮可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXComboBox.HasValue">
+            <summary>
+            获取当前是否已有选中项或输入文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXComboBox.OnApplyTemplate">
+            <summary>
+            应用控件模板，并重新挂接清除按钮和可编辑文本框事件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXComboBox.OnDropDownClosed(System.EventArgs)">
+            <summary>
+            下拉框关闭后刷新是否有值的状态。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXMultiComboBox">
+            <summary>
+            多选下拉框，基于 ListBox 实现多选，并将选中项汇总为文本显示。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMultiComboBox.WatermarkProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMultiComboBox.Watermark"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMultiComboBox.ClearButtonVisibilityProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMultiComboBox.ClearButtonVisibility"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMultiComboBox.IsDropDownOpenProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMultiComboBox.IsDropDownOpen"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMultiComboBox.SelectedTextProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMultiComboBox.SelectedText"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMultiComboBox.SelectionSeparatorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMultiComboBox.SelectionSeparator"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMultiComboBox.HasSelectionProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXMultiComboBox.HasSelection"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMultiComboBox.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXMultiComboBox"/> 的新实例，并启用多选模式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMultiComboBox.Watermark">
+            <summary>
+            获取或设置未选择时显示的水印内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMultiComboBox.ClearButtonVisibility">
+            <summary>
+            获取或设置清除按钮可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMultiComboBox.IsDropDownOpen">
+            <summary>
+            获取或设置下拉区域是否打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMultiComboBox.SelectedText">
+            <summary>
+            获取或设置选中项汇总文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMultiComboBox.SelectionSeparator">
+            <summary>
+            获取或设置多个选中项之间的分隔符。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMultiComboBox.HasSelection">
+            <summary>
+            获取当前是否已有选中项。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMultiComboBox.OnApplyTemplate">
+            <summary>
+            应用控件模板，并挂接下拉按钮、清除按钮和弹出层。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMultiComboBox.OnVisualParentChanged(System.Windows.DependencyObject)">
+            <summary>
+            可视父级变化时重新查找宿主窗口，以便点击外部区域关闭下拉层。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMultiComboBox.OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs)">
+            <summary>
+            选择项变化时同步汇总文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMultiComboBox.OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            数据项变化时刷新选择状态，避免删除已选项后显示残留文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMultiComboBox.OnPreviewKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            处理 Esc 键关闭下拉层。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXColorPicker">
+            <summary>
+            颜色选择器控件，支持十六进制文本输入、预设色块选择和系统颜色对话框选择。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXColorPicker.SelectedColorProperty">
+            <summary>
+            当前选中颜色依赖属性，默认值为主色 #2563EB，并默认支持双向绑定。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXColorPicker.HexTextProperty">
+            <summary>
+            十六进制颜色文本依赖属性，和 SelectedColor 保持双向同步。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXColorPicker.PresetColorsProperty">
+            <summary>
+            预设色块列表依赖属性，支持英文逗号、英文分号、中文逗号和中文分号分隔。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXColorPicker.SelectedColor">
+            <summary>
+            获取或设置当前选中的颜色值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXColorPicker.HexText">
+            <summary>
+            获取或设置当前颜色的十六进制文本，例如 #2563EB。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXColorPicker.PresetColors">
+            <summary>
+            获取或设置下拉面板中的预设颜色集合，多个颜色用逗号或分号分隔。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXColorPicker.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定文本框、色块区域和颜色对话框按钮事件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDataGridDensity">
+            <summary>
+            表格密度，用于控制行高和内容留白。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDataGridDensity.Compact">
+            <summary>紧凑密度，适合高数据量页面。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDataGridDensity.Standard">
+            <summary>标准密度。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDataGridDensity.Comfortable">
+            <summary>舒适密度，适合阅读型页面。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDataGrid">
+            <summary>
+            增强 DataGrid，默认开启行列虚拟化和回收模式，适合大数据量表格展示。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDataGrid.DensityProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDataGrid.Density"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDataGrid.CornerRadiusProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDataGrid.CornerRadius"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDataGrid.#ctor">
+            <summary>
+            初始化表格，并开启 WPF 虚拟化相关选项。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDataGrid.Density">
+            <summary>
+            获取或设置表格密度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDataGrid.CornerRadius">
+            <summary>
+            获取或设置表格外框圆角。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDataGridTextColumn">
+            <summary>
+            TX.WpfUI 文本列，默认应用表格文本单元格、显示元素和编辑元素样式。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDataGridTextColumn.GenerateElement(System.Windows.Controls.DataGridCell,System.Object)">
+            <summary>
+            生成单元格显示状态下的内容元素。
+            </summary>
+            <param name="cell">当前数据单元格。</param>
+            <param name="dataItem">当前数据项。</param>
+            <returns>用于显示状态的内容元素。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDataGridTextColumn.GenerateEditingElement(System.Windows.Controls.DataGridCell,System.Object)">
+            <summary>
+            生成单元格编辑状态下的内容元素。
+            </summary>
+            <param name="cell">当前数据单元格。</param>
+            <param name="dataItem">当前数据项。</param>
+            <returns>用于编辑状态的内容元素。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDateTimePicker">
+            <summary>
+            日期时间选择器，支持日期、月份、年份视图以及可选时间选择。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.SelectedDateTimeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.SelectedDateTime"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.WatermarkProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.Watermark"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.ClearButtonVisibilityProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.ClearButtonVisibility"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.IsDropDownOpenProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.IsDropDownOpen"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.ShowTimeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.ShowTime"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.DisplayFormatProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.DisplayFormat"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.PendingDateProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.PendingDate"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.PendingHourProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.PendingHour"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.PendingMinuteProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.PendingMinute"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.PendingSecondProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.PendingSecond"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.CalendarViewProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.CalendarView"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.DisplayTextProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.DisplayText"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.PendingTimeTextProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.PendingTimeText"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.DisplayMonthTextProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.DisplayMonthText"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.IsDayViewProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.IsDayView"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.IsMonthViewProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.IsMonthView"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.IsYearViewProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.IsYearView"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDateTimePicker.HasValueProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.HasValue"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDateTimePicker.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXDateTimePicker"/> 的新实例，并准备日历与时间选择数据源。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.SelectedDateTime">
+            <summary>
+            获取或设置已确认的日期时间。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.Watermark">
+            <summary>
+            获取或设置未选择日期时间时显示的水印内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.ClearButtonVisibility">
+            <summary>
+            获取或设置清除按钮可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.IsDropDownOpen">
+            <summary>
+            获取或设置下拉日历是否打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.ShowTime">
+            <summary>
+            获取或设置是否显示时分秒选择区域。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.DisplayFormat">
+            <summary>
+            获取或设置显示格式；为空时根据 <see cref="P:TX.WpfUI.Controls.TXDateTimePicker.ShowTime"/> 自动选择默认格式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.PendingDate">
+            <summary>
+            获取或设置弹出层中尚未确认的日期。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.PendingHour">
+            <summary>
+            获取或设置弹出层中尚未确认的小时。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.PendingMinute">
+            <summary>
+            获取或设置弹出层中尚未确认的分钟。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.PendingSecond">
+            <summary>
+            获取或设置弹出层中尚未确认的秒。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.CalendarView">
+            <summary>
+            获取或设置当前日历视图。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.DisplayText">
+            <summary>
+            获取当前用于输入框展示的文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.PendingTimeText">
+            <summary>
+            获取弹出层中待确认时间的格式化文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.DisplayMonthText">
+            <summary>
+            获取日历标题中显示的年月文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.IsDayView">
+            <summary>
+            获取当前是否为日期视图。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.IsMonthView">
+            <summary>
+            获取当前是否为月份视图。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.IsYearView">
+            <summary>
+            获取当前是否为年份视图。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.HasValue">
+            <summary>
+            获取当前是否已选择日期时间。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.Hours">
+            <summary>获取小时列表，范围为 0 到 23。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.Minutes">
+            <summary>获取分钟列表，范围为 0 到 59。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.Seconds">
+            <summary>获取秒列表，范围为 0 到 59。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.CalendarDays">
+            <summary>获取日期视图中的日期单元格集合。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.CalendarMonths">
+            <summary>获取月份视图中的月份单元格集合。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDateTimePicker.CalendarYears">
+            <summary>获取年份视图中的年份单元格集合。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDateTimePicker.OnApplyTemplate">
+            <summary>
+            应用控件模板，并挂接日历按钮、下拉按钮与时间列表。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDateTimePicker.OnPreviewKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            处理键盘交互，Enter 确认选择，Escape 关闭下拉层。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXCalendarView">
+            <summary>
+            日期时间选择器的日历视图类型。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXCalendarView.Day">
+            <summary>日期视图。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXCalendarView.Month">
+            <summary>月份视图。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXCalendarView.Year">
+            <summary>年份视图。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXCalendarDay">
+            <summary>
+            日期视图中的日期单元格数据。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarDay.Date">
+            <summary>获取或设置该单元格对应的完整日期。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarDay.Day">
+            <summary>获取或设置日期数字显示文本。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarDay.IsCurrentMonth">
+            <summary>获取或设置该日期是否属于当前展示月份。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarDay.IsToday">
+            <summary>获取或设置该日期是否为今天。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarDay.IsSelected">
+            <summary>获取或设置该日期是否为当前选中日期。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXCalendarMonth">
+            <summary>
+            月份视图中的月份单元格数据。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarMonth.Month">
+            <summary>获取或设置月份数字，范围为 1 到 12。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarMonth.Text">
+            <summary>获取或设置月份显示文本。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarMonth.IsSelected">
+            <summary>获取或设置该月份是否为当前选中月份。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXCalendarYear">
+            <summary>
+            年份视图中的年份单元格数据。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarYear.Year">
+            <summary>获取或设置年份数字。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarYear.Text">
+            <summary>获取或设置年份显示文本。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXCalendarYear.IsSelected">
+            <summary>获取或设置该年份是否为当前选中年份。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDrawerPlacement">
+            <summary>
+            抽屉弹出方向。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawerPlacement.Left">
+            <summary>从左侧弹出。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawerPlacement.Right">
+            <summary>从右侧弹出。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawerPlacement.Top">
+            <summary>从顶部弹出。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawerPlacement.Bottom">
+            <summary>从底部弹出。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDrawer">
+            <summary>
+            抽屉面板控件，适合承载详情、筛选、编辑表单等侧边内容。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.IsOpenProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.IsOpen"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.PlacementProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.Placement"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.HeaderProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.Header"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.DrawerWidthProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.DrawerWidth"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.DrawerHeightProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.DrawerHeight"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.ShowMaskProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.ShowMask"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.CloseOnMaskClickProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.CloseOnMaskClick"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDrawer.CloseCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDrawer.CloseCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDrawer.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXDrawer"/> 的新实例，并提供默认关闭命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.IsOpen">
+            <summary>
+            获取或设置抽屉是否打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.Placement">
+            <summary>
+            获取或设置抽屉弹出方向。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.Header">
+            <summary>
+            获取或设置抽屉标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.DrawerWidth">
+            <summary>
+            获取或设置左右抽屉的宽度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.DrawerHeight">
+            <summary>
+            获取或设置上下抽屉的高度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.ShowMask">
+            <summary>
+            获取或设置是否显示遮罩。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.CloseOnMaskClick">
+            <summary>
+            获取或设置点击遮罩时是否关闭抽屉。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDrawer.CloseCommand">
+            <summary>
+            获取或设置关闭命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDrawer.OnApplyTemplate">
+            <summary>
+            应用控件模板，并挂接遮罩、关闭按钮与抽屉位移动画对象。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPopoverOpenMode">
+            <summary>
+            Popover 触发方式。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopoverOpenMode.Click">
+            <summary>点击触发内容区域时打开或关闭。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopoverOpenMode.Hover">
+            <summary>鼠标悬停时打开，离开触发区和浮层后关闭。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopoverOpenMode.Manual">
+            <summary>只通过 <see cref="P:TX.WpfUI.Controls.TXPopover.IsOpen"/> 手动控制。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTooltip">
+            <summary>
+            轻提示控件，用于承载简短说明。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTooltip.TitleProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTooltip.Title"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTooltip.Title">
+            <summary>
+            获取或设置轻提示标题。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPopover">
+            <summary>
+            气泡卡片控件，用于在触发元素旁展示更丰富的浮层内容。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.TitleProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.Title"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.PopupContentProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.PopupContent"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.IsOpenProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.IsOpen"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.PlacementProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.Placement"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.HorizontalOffsetProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.HorizontalOffset"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.VerticalOffsetProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.VerticalOffset"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.StaysOpenProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.StaysOpen"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPopover.OpenModeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXPopover.OpenMode"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.Title">
+            <summary>
+            获取或设置气泡卡片标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.PopupContent">
+            <summary>
+            获取或设置气泡卡片内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.IsOpen">
+            <summary>
+            获取或设置气泡卡片是否打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.Placement">
+            <summary>
+            获取或设置气泡卡片相对触发元素的位置。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.HorizontalOffset">
+            <summary>
+            获取或设置气泡卡片水平偏移。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.VerticalOffset">
+            <summary>
+            获取或设置气泡卡片垂直偏移。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.StaysOpen">
+            <summary>
+            获取或设置浮层是否在失焦后保持打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPopover.OpenMode">
+            <summary>
+            获取或设置浮层打开方式。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPopover.OnApplyTemplate">
+            <summary>
+            应用控件模板并挂接触发事件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXResult">
+            <summary>
+            结果展示控件，用于成功、失败、警告和信息结果页。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.ResultTypeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.ResultType"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.IconProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.Icon"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.TitleProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.Title"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.DescriptionProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.Description"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.ActionContentProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.ActionContent"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.ActionCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.ActionCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXResult.ActionCommandParameterProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXResult.ActionCommandParameter"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.ResultType">
+            <summary>
+            获取或设置结果语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.Icon">
+            <summary>
+            获取或设置自定义结果图标。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.Title">
+            <summary>
+            获取或设置结果标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.Description">
+            <summary>
+            获取或设置结果说明。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.ActionContent">
+            <summary>
+            获取或设置行动按钮内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.ActionCommand">
+            <summary>
+            获取或设置行动按钮命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXResult.ActionCommandParameter">
+            <summary>
+            获取或设置行动按钮命令参数。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTimeline">
+            <summary>
+            时间线控件，用于展示按时间或顺序发生的事件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTimeline.GetContainerForItemOverride">
+            <summary>
+            创建时间线项容器。
+            </summary>
+            <returns>时间线项容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTimeline.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断数据项是否已经是时间线项容器。
+            </summary>
+            <param name="item">数据项。</param>
+            <returns>如果已经是容器则返回 true。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTimeline.PrepareContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            准备时间线项容器。
+            </summary>
+            <param name="element">容器。</param>
+            <param name="item">数据项。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTimeline.ClearContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            清理时间线项容器。
+            </summary>
+            <param name="element">容器。</param>
+            <param name="item">数据项。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTimeline.OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            项集合变化后刷新最后一项标记。
+            </summary>
+            <param name="e">集合变化参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTimelineItem">
+            <summary>
+            时间线中的单个事件项。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.TitleProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.Title"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.TimeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.Time"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.DescriptionProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.Description"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.ItemTypeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.ItemType"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.DotContentProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.DotContent"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.IsLastProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.IsLast"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTimelineItem.IndexProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTimelineItem.Index"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.Title">
+            <summary>
+            获取或设置事件标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.Time">
+            <summary>
+            获取或设置事件时间。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.Description">
+            <summary>
+            获取或设置事件说明。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.ItemType">
+            <summary>
+            获取或设置事件语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.DotContent">
+            <summary>
+            获取或设置时间线节点中的自定义内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.IsLast">
+            <summary>
+            获取或设置是否为最后一个事件项。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTimelineItem.Index">
+            <summary>
+            获取或设置事件项索引。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXIcon">
+            <summary>
+            表示用于绘制几何图标的轻量级控件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIcon.SourceProperty">
+            <summary>
+            图标数据源依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIcon.ForegroundProperty">
+            <summary>
+            图标前景画刷依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIcon.SizeProperty">
+            <summary>
+            图标尺寸依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIcon.StretchProperty">
+            <summary>
+            图标拉伸方式依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXIcon.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXIcon"/> 类的新实例。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIcon.Source">
+            <summary>
+            获取或设置图标数据源。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIcon.Foreground">
+            <summary>
+            获取或设置图标前景画刷。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIcon.Size">
+            <summary>
+            获取或设置图标尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIcon.Stretch">
+            <summary>
+            获取或设置图标拉伸方式。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXIcon.MeasureOverride(System.Windows.Size)">
+            <summary>
+            测量图标控件所需的布局尺寸。
+            </summary>
+            <param name="availableSize">布局系统提供的可用尺寸。</param>
+            <returns>控件期望占用的尺寸。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXIcon.OnRender(System.Windows.Media.DrawingContext)">
+            <summary>
+            绘制图标的视觉内容。
+            </summary>
+            <param name="drawingContext">用于绘制图标的绘图上下文。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXImageViewer">
+            <summary>
+            支持拖动平移、滚轮缩放、适应窗口和保存图片的图片查看控件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.SourceProperty">
+            <summary>
+            图片源依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.ImagePathProperty">
+            <summary>
+            图片文件路径依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.ZoomProperty">
+            <summary>
+            当前缩放比例依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.OffsetXProperty">
+            <summary>
+            图片水平偏移依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.OffsetYProperty">
+            <summary>
+            图片垂直偏移依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.RotationAngleProperty">
+            <summary>
+            图片旋转角度依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.MinZoomProperty">
+            <summary>
+            最小缩放比例依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.MaxZoomProperty">
+            <summary>
+            最大缩放比例依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.ZoomStepProperty">
+            <summary>
+            每次缩放的比例步长依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.IsToolbarVisibleProperty">
+            <summary>
+            是否显示内置工具栏依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.AutoFitOnSourceChangedProperty">
+            <summary>
+            图片变化后是否自动适应窗口依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXImageViewer.IsImageLoadedProperty">
+            <summary>
+            是否已加载图片依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXImageViewer"/> 类的新实例。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.Source">
+            <summary>
+            获取或设置图片源。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.ImagePath">
+            <summary>
+            获取或设置图片文件路径，设置后控件会自动读取图片到 <see cref="P:TX.WpfUI.Controls.TXImageViewer.Source"/>。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.Zoom">
+            <summary>
+            获取或设置当前缩放比例，1 表示 100%。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.OffsetX">
+            <summary>
+            获取或设置图片水平偏移。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.OffsetY">
+            <summary>
+            获取或设置图片垂直偏移。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.RotationAngle">
+            <summary>
+            获取或设置图片旋转角度，单位为度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.MinZoom">
+            <summary>
+            获取或设置允许的最小缩放比例。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.MaxZoom">
+            <summary>
+            获取或设置允许的最大缩放比例。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.ZoomStep">
+            <summary>
+            获取或设置每次放大或缩小时使用的比例步长。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.IsToolbarVisible">
+            <summary>
+            获取或设置是否显示内置工具栏。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.AutoFitOnSourceChanged">
+            <summary>
+            获取或设置图片源变化后是否自动适应窗口。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.IsImageLoaded">
+            <summary>
+            获取当前是否已加载图片。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.ZoomInCommand">
+            <summary>
+            获取放大图片命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.ZoomOutCommand">
+            <summary>
+            获取缩小图片命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.FitCommand">
+            <summary>
+            获取适应窗口命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.ResetCommand">
+            <summary>
+            获取原始大小命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.RotateLeftCommand">
+            <summary>
+            获取向左旋转图片命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.RotateRightCommand">
+            <summary>
+            获取向右旋转图片命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXImageViewer.SaveCommand">
+            <summary>
+            获取保存图片命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定图片视口的鼠标交互事件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.ZoomIn">
+            <summary>
+            按当前步长放大图片。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.ZoomOut">
+            <summary>
+            按当前步长缩小图片。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.FitToView">
+            <summary>
+            将图片缩放并居中到完整适应当前视口。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.ResetView">
+            <summary>
+            将图片恢复到 100% 并居中显示。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.RotateLeft">
+            <summary>
+            将图片向左旋转 90 度。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.RotateRight">
+            <summary>
+            将图片向右旋转 90 度。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.SaveImage">
+            <summary>
+            打开保存对话框并保存当前图片。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXImageViewer.SaveToFile(System.String)">
+            <summary>
+            将当前图片保存到指定文件。
+            </summary>
+            <param name="fileName">目标文件路径。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXIpAddressBox">
+            <summary>
+            IPv4 address input control with four numeric segments.
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.AddressProperty">
+            <summary>
+            IP 地址依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.Segment1Property">
+            <summary>
+            第一段 IP 地址依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.Segment2Property">
+            <summary>
+            第二段 IP 地址依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.Segment3Property">
+            <summary>
+            第三段 IP 地址依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.Segment4Property">
+            <summary>
+            第四段 IP 地址依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.IsAddressValidProperty">
+            <summary>
+            IP 地址是否有效依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXIpAddressBox.HasInputProperty">
+            <summary>
+            是否已有输入依赖属性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.Address">
+            <summary>
+            获取或设置IP 地址。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.Segment1">
+            <summary>
+            获取或设置第一段 IP 地址。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.Segment2">
+            <summary>
+            获取或设置第二段 IP 地址。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.Segment3">
+            <summary>
+            获取或设置第三段 IP 地址。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.Segment4">
+            <summary>
+            获取或设置第四段 IP 地址。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.IsAddressValid">
+            <summary>
+            获取或设置IP 地址是否有效。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXIpAddressBox.HasInput">
+            <summary>
+            获取或设置是否已有输入。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXIpAddressBox.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定模板部件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXLoadingMode">
+            <summary>
+            加载动画模式。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingMode.DotRing">
+            <summary>环形点阵动画。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingMode.PulseDots">
+            <summary>三点脉冲动画。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingMode.Arc">
+            <summary>圆弧旋转动画。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXLoading">
+            <summary>
+            轻量加载控件，直接通过 DrawingContext 绘制动画，避免额外模板复杂度。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.ModeProperty">
+            <summary>
+            加载模式依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.IsActiveProperty">
+            <summary>
+            是否正在加载依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.TextProperty">
+            <summary>
+            显示文本依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.DotCountProperty">
+            <summary>
+            圆点数量依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.DotSizeProperty">
+            <summary>
+            圆点尺寸依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.StrokeThicknessProperty">
+            <summary>
+            描边粗细依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoading.SpeedRatioProperty">
+            <summary>
+            动画速度比例依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXLoading.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXLoading"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.Mode">
+            <summary>
+            获取或设置加载动画模式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.IsActive">
+            <summary>
+            获取或设置动画是否运行。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.Text">
+            <summary>
+            获取或设置加载提示文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.DotCount">
+            <summary>
+            获取或设置点阵模式下的点数量。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.DotSize">
+            <summary>
+            获取或设置点阵或脉冲点的尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.StrokeThickness">
+            <summary>
+            获取或设置圆弧模式的线宽。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoading.SpeedRatio">
+            <summary>
+            获取或设置动画速度倍率。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXLoading.MeasureOverride(System.Windows.Size)">
+            <summary>
+            测量控件所需的布局尺寸。
+            </summary>
+            <param name="constraint">constraint 参数。</param>
+            <returns>控件期望占用的尺寸。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXLoading.OnRender(System.Windows.Media.DrawingContext)">
+            <summary>
+            绘制控件视觉内容。
+            </summary>
+            <param name="drawingContext">用于绘制内容的绘图上下文。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXLoadingOverlay">
+            <summary>
+            页面遮罩加载控件，可包装任意页面内容并在忙碌时覆盖加载层。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingOverlay.IsActiveProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLoadingOverlay.IsActive"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingOverlay.TextProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLoadingOverlay.Text"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingOverlay.LoadingModeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLoadingOverlay.LoadingMode"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLoadingOverlay.MaskBrushProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLoadingOverlay.MaskBrush"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoadingOverlay.IsActive">
+            <summary>
+            获取或设置加载遮罩是否显示。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoadingOverlay.Text">
+            <summary>
+            获取或设置加载提示文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoadingOverlay.LoadingMode">
+            <summary>
+            获取或设置加载动画样式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLoadingOverlay.MaskBrush">
+            <summary>
+            获取或设置覆盖内容区域的遮罩画刷。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXLinkType">
+            <summary>
+            链接颜色类型，用于区分常规链接、次要链接和语义状态链接。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkType.Primary">
+            <summary>主色链接。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkType.Secondary">
+            <summary>次要链接。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkType.Success">
+            <summary>成功链接。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkType.Warning">
+            <summary>警告链接。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkType.Danger">
+            <summary>危险链接。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXLinkSize">
+            <summary>
+            链接尺寸枚举，用于控制字号和最小高度。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkSize.Small">
+            <summary>小尺寸链接。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkSize.Medium">
+            <summary>中等尺寸链接。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLinkSize.Large">
+            <summary>大尺寸链接。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXLink">
+            <summary>
+            TX.WpfUI 链接控件，支持 NavigateUri 自动打开链接，也支持 Command 参与业务逻辑。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.NavigateUriProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.NavigateUri"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.LinkTypeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.LinkType"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.LinkSizeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.LinkSize"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.IconProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.Icon"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.IconPlacementProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.IconPlacement"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.IconSpacingProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.IconSpacing"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXLink.ShowUnderlineProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXLink.ShowUnderline"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXLink.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXLink"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.NavigateUri">
+            <summary>
+            获取或设置点击后打开的链接地址。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.LinkType">
+            <summary>
+            获取或设置链接语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.LinkSize">
+            <summary>
+            获取或设置链接尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.Icon">
+            <summary>
+            获取或设置链接前后的图标内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.IconPlacement">
+            <summary>
+            获取或设置图标相对链接内容的位置。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.IconSpacing">
+            <summary>
+            获取或设置图标与文本之间的间距。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXLink.ShowUnderline">
+            <summary>
+            获取或设置是否显示下划线。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXLink.OnClick">
+            <summary>
+            处理控件点击逻辑。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXMessageBox">
+            <summary>
+            替代原生 MessageBox 的样式化消息弹窗。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBox.Show(System.String)">
+            <summary>
+            显示仅包含消息文本的消息框。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBox.Show(System.String,System.String)">
+            <summary>
+            显示包含标题和消息文本的消息框。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBox.Show(System.String,System.String,System.Windows.MessageBoxButton)">
+            <summary>
+            显示包含指定按钮组合的消息框。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBox.Show(System.String,System.String,System.Windows.MessageBoxButton,System.Windows.MessageBoxImage)">
+            <summary>
+            显示包含指定按钮组合和图标类型的消息框。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBox.Show(System.Windows.Window,System.String,System.String,System.Windows.MessageBoxButton,System.Windows.MessageBoxImage)">
+            <summary>
+            显示样式化消息框，并可指定所属窗口。
+            </summary>
+            <param name="owner">所属窗口；为空时居中到屏幕。</param>
+            <param name="messageBoxText">消息正文。</param>
+            <param name="caption">标题文本。</param>
+            <param name="button">按钮组合。</param>
+            <param name="icon">图标类型。</param>
+            <returns>用户单击按钮对应的结果。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXMessageBoxWindow">
+            <summary>
+            TXMessageBox 的内部承载窗口。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBoxWindow.#ctor(System.String,System.String,System.Windows.MessageBoxButton,System.Windows.MessageBoxImage)">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXMessageBoxWindow"/> 的新实例。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxWindow.Result">
+            <summary>
+            获取消息框关闭时返回给调用方的结果。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXMessageBoxView">
+            <summary>
+            TXMessageBox 的模板承载控件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMessageBoxView.CaptionProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMessageBoxView.Caption"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMessageBoxView.MessageProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMessageBoxView.Message"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMessageBoxView.IconProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMessageBoxView.Icon"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMessageBoxView.ButtonsProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMessageBoxView.Buttons"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMessageBoxView.CloseCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMessageBoxView.CloseCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXMessageBoxView.ButtonCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXMessageBoxView.ButtonCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXMessageBoxView.DragRequested">
+            <summary>
+            请求所属窗口开始拖动。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxView.Caption">
+            <summary>
+            获取或设置消息框标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxView.Message">
+            <summary>
+            获取或设置消息框正文。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxView.Icon">
+            <summary>
+            获取或设置消息框图标类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxView.Buttons">
+            <summary>
+            获取或设置消息框按钮集合。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxView.CloseCommand">
+            <summary>
+            获取或设置关闭消息框的命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxView.ButtonCommand">
+            <summary>
+            获取或设置点击结果按钮时执行的命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBoxView.OnApplyTemplate">
+            <summary>
+            应用控件模板并挂接标题栏拖动事件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXMessageBoxButton">
+            <summary>
+            TXMessageBox 模板中的按钮描述。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXMessageBoxButton.#ctor(System.String,System.Windows.MessageBoxResult,TX.WpfUI.Controls.TXButtonType)">
+            <summary>
+            初始化消息框按钮描述。
+            </summary>
+            <param name="text">按钮文本。</param>
+            <param name="result">按钮对应的消息框结果。</param>
+            <param name="buttonType">按钮语义样式。</param>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxButton.Text">
+            <summary>
+            获取按钮文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxButton.Result">
+            <summary>
+            获取按钮对应的消息框结果。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXMessageBoxButton.ButtonType">
+            <summary>
+            获取按钮语义样式。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXNavigationViewSelectionTrigger">
+            <summary>
+            导航项触发选中和命令的方式。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewSelectionTrigger.Click">
+            <summary>
+            单击导航项时立即选中并执行命令。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewSelectionTrigger.DoubleClick">
+            <summary>
+            单击父级项只展开或收起，双击导航项才选中并执行命令。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXNavigationView">
+            <summary>
+            TX 左侧导航控件，支持标题、底部区域、多层级导航项和选中项切换。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.HeaderProperty">
+            <summary>
+            导航顶部内容，通常用于放置标题、Logo 或当前系统信息。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.FooterProperty">
+            <summary>
+            导航底部内容，通常用于放置说明、账号入口或版本信息。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.HeaderTemplateProperty">
+            <summary>
+            Header 的展示模板，用于将任意对象渲染成自定义顶部区域。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.FooterTemplateProperty">
+            <summary>
+            Footer 的展示模板，用于将任意对象渲染成自定义底部区域。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.PaneWidthProperty">
+            <summary>
+            左侧导航面板宽度。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.SelectedItemProperty">
+            <summary>
+            当前选中的业务数据项，默认支持双向绑定。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.ItemCommandProperty">
+            <summary>
+            导航项被激活时执行的命令。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.SelectionTriggerProperty">
+            <summary>
+            控制导航项通过单击还是双击触发选中和命令。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.IconMemberPathProperty">
+            <summary>
+            ItemsSource 数据项中用于绑定图标的属性路径。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.IconTemplateProperty">
+            <summary>
+            导航项图标模板。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.DescriptionMemberPathProperty">
+            <summary>
+            ItemsSource 数据项中用于绑定说明文本的属性路径。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.BadgeMemberPathProperty">
+            <summary>
+            ItemsSource 数据项中用于绑定徽标内容的属性路径。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.ChildrenMemberPathProperty">
+            <summary>
+            ItemsSource 数据项中用于绑定子导航集合的属性路径。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationView.ItemCommandParameterPathProperty">
+            <summary>
+            ItemsSource 数据项中用于绑定命令参数的属性路径；为空时使用数据项自身。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.Header">
+            <summary>
+            获取或设置导航顶部内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.Footer">
+            <summary>
+            获取或设置导航底部内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.HeaderTemplate">
+            <summary>
+            获取或设置导航顶部内容模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.FooterTemplate">
+            <summary>
+            获取或设置导航底部内容模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.PaneWidth">
+            <summary>
+            获取或设置导航面板宽度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.SelectedItem">
+            <summary>
+            获取或设置当前选中的导航数据项。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.ItemCommand">
+            <summary>
+            获取或设置导航项激活命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.SelectionTrigger">
+            <summary>
+            获取或设置导航项的选中触发方式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.IconMemberPath">
+            <summary>
+            获取或设置图标绑定路径。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.IconTemplate">
+            <summary>
+            获取或设置导航项图标模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.DescriptionMemberPath">
+            <summary>
+            获取或设置说明文本绑定路径。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.BadgeMemberPath">
+            <summary>
+            获取或设置徽标绑定路径。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.ChildrenMemberPath">
+            <summary>
+            获取或设置子级导航集合绑定路径。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationView.ItemCommandParameterPath">
+            <summary>
+            获取或设置命令参数绑定路径。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.SelectItem(TX.WpfUI.Controls.TXNavigationViewItem)">
+            <summary>
+            由导航项调用，统一维护选中状态和 SelectedItem。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.GetContainerForItemOverride">
+            <summary>
+            创建当前控件使用的项目容器。
+            </summary>
+            <returns>创建的项目容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断项目是否已经是当前控件的项目容器。
+            </summary>
+            <param name="item">当前项目。</param>
+            <returns>如果项目已经是容器则为 true；否则为 false。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.PrepareContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            准备项目容器并同步相关状态。
+            </summary>
+            <param name="element">进入编辑状态的元素。</param>
+            <param name="item">当前项目。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.SelectValue(System.Windows.Controls.ItemsControl,System.Object)">
+            <summary>
+            从当前容器树中递归查找目标值，并在找到后展开它的祖先节点。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.ClearSelection(System.Windows.Controls.ItemsControl)">
+            <summary>
+            清理指定层级及其所有子级的选中状态，保证同一导航树内只有一个选中项。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationView.ExpandAncestors(System.Windows.DependencyObject)">
+            <summary>
+            选中深层节点时展开所有父级导航项，避免 SelectedItem 指向不可见节点。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXNavigationViewItem">
+            <summary>
+            TX 左侧导航项，支持图标、说明文本、徽标、子项和点击命令。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.ignoreNextMouseLeftButtonUp">
+            <summary>
+            双击模式下，Preview 阶段已处理激活时用于吞掉随后到来的 MouseLeftButtonUp。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.ContentProperty">
+            <summary>
+            导航项主内容。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.ContentTemplateProperty">
+            <summary>
+            导航项主内容模板。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.IconProperty">
+            <summary>
+            导航项图标。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.IconTemplateProperty">
+            <summary>
+            导航项图标模板。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.DescriptionProperty">
+            <summary>
+            导航项说明文本。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.DescriptionTemplateProperty">
+            <summary>
+            导航项说明文本模板。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.BadgeProperty">
+            <summary>
+            导航项徽标内容。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.BadgeTemplateProperty">
+            <summary>
+            导航项徽标模板。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.CommandProperty">
+            <summary>
+            当前导航项专属命令；为空时回退到所属 TXNavigationView 的 ItemCommand。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.CommandParameterProperty">
+            <summary>
+            当前导航项命令参数；为空时使用 DataContext 或 Content。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.IsSelectedProperty">
+            <summary>
+            标识导航项是否处于选中状态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.IsExpandedProperty">
+            <summary>
+            标识导航项子级是否展开。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNavigationViewItem.LevelProperty">
+            <summary>
+            当前导航项在树中的层级，用于模板计算缩进。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.SelectionValue">
+            <summary>
+            实际参与选中比较和命令执行的值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.Content">
+            <summary>
+            获取或设置导航项主内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.ContentTemplate">
+            <summary>
+            获取或设置导航项主内容模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.Icon">
+            <summary>
+            获取或设置导航项图标。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.IconTemplate">
+            <summary>
+            获取或设置导航项图标模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.Description">
+            <summary>
+            获取或设置导航项说明文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.DescriptionTemplate">
+            <summary>
+            获取或设置导航项说明文本模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.Badge">
+            <summary>
+            获取或设置导航项徽标内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.BadgeTemplate">
+            <summary>
+            获取或设置导航项徽标模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.Command">
+            <summary>
+            获取或设置导航项自己的命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.CommandParameter">
+            <summary>
+            获取或设置导航项命令参数。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.IsSelected">
+            <summary>
+            获取或设置导航项是否选中。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.IsExpanded">
+            <summary>
+            获取或设置导航项是否展开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNavigationViewItem.Level">
+            <summary>
+            获取或设置导航项层级。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.GetContainerForItemOverride">
+            <summary>
+            创建当前控件使用的项目容器。
+            </summary>
+            <returns>创建的项目容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断项目是否已经是当前控件的项目容器。
+            </summary>
+            <param name="item">当前项目。</param>
+            <returns>如果项目已经是容器则为 true；否则为 false。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.PrepareContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            准备项目容器并同步相关状态。
+            </summary>
+            <param name="element">进入编辑状态的元素。</param>
+            <param name="item">当前项目。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            处理鼠标左键预按下事件。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            处理鼠标左键松开事件。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.OnMouseDoubleClick(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            处理鼠标双击事件。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.OnKeyUp(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            处理按键松开事件。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.SelectAndExecute">
+            <summary>
+            执行完整的激活流程：更新导航选中项，然后触发命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.ToggleExpansion">
+            <summary>
+            如果当前项存在子项，则切换展开状态。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.ExecuteCommand">
+            <summary>
+            优先执行导航项自己的命令，没有设置时执行父导航控件的统一命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.SetOptionalBinding(System.Windows.DependencyObject,System.Windows.DependencyProperty,System.String)">
+            <summary>
+            根据路径设置可选绑定；路径为空时清除旧绑定，避免容器复用残留。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNavigationViewItem.IsNearestNavigationItem(System.Object)">
+            <summary>
+            判断鼠标事件是否来自当前导航项本身，避免子级冒泡导致父级误触发。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXBreadcrumb">
+            <summary>
+            面包屑导航控件，用于展示当前页面或数据层级路径。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBreadcrumb.SeparatorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBreadcrumb.Separator"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBreadcrumb.ItemCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBreadcrumb.ItemCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBreadcrumb.Separator">
+            <summary>
+            获取或设置路径项之间的分隔内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBreadcrumb.ItemCommand">
+            <summary>
+            获取或设置点击路径项时使用的默认命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXBreadcrumb.GetContainerForItemOverride">
+            <summary>
+            创建面包屑项容器。
+            </summary>
+            <returns>面包屑项容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXBreadcrumb.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断数据项是否已经是面包屑项容器。
+            </summary>
+            <param name="item">数据项。</param>
+            <returns>如果已经是容器则返回 true。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXBreadcrumb.PrepareContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            准备面包屑项容器。
+            </summary>
+            <param name="element">容器。</param>
+            <param name="item">数据项。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXBreadcrumb.ClearContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            清理面包屑项容器。
+            </summary>
+            <param name="element">容器。</param>
+            <param name="item">数据项。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXBreadcrumb.OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            项集合变化后刷新最后一项和命令状态。
+            </summary>
+            <param name="e">集合变化参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXBreadcrumbItem">
+            <summary>
+            面包屑中的单个路径项。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBreadcrumbItem.SeparatorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBreadcrumbItem.Separator"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBreadcrumbItem.IsCurrentProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBreadcrumbItem.IsCurrent"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBreadcrumbItem.IsLastProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBreadcrumbItem.IsLast"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBreadcrumbItem.IndexProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBreadcrumbItem.Index"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBreadcrumbItem.Separator">
+            <summary>
+            获取或设置当前项后方的分隔内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBreadcrumbItem.IsCurrent">
+            <summary>
+            获取或设置是否为当前路径项。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBreadcrumbItem.IsLast">
+            <summary>
+            获取或设置是否为最后一个路径项。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBreadcrumbItem.Index">
+            <summary>
+            获取或设置路径项索引。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXBreadcrumbItem.OnContentChanged(System.Object,System.Object)">
+            <summary>
+            内容变化后刷新默认命令参数。
+            </summary>
+            <param name="oldContent">旧内容。</param>
+            <param name="newContent">新内容。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXNumericBox">
+            <summary>
+            数字输入框，支持最小值、最大值、步进、格式化和上下调节按钮。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.ValueProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.Value"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.MinimumProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.Minimum"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.MaximumProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.Maximum"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.IncrementProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.Increment"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.DecimalPlacesProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.DecimalPlaces"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.ShowSpinButtonsProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.ShowSpinButtons"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXNumericBox.UnitProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXNumericBox.Unit"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNumericBox.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXNumericBox"/> 的新实例，并启用粘贴内容校验。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.Value">
+            <summary>
+            获取或设置当前数值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.Minimum">
+            <summary>
+            获取或设置允许输入的最小值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.Maximum">
+            <summary>
+            获取或设置允许输入的最大值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.Increment">
+            <summary>
+            获取或设置每次点击调节按钮或按方向键时变化的步进值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.DecimalPlaces">
+            <summary>
+            获取或设置显示和提交时保留的小数位数。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.ShowSpinButtons">
+            <summary>
+            获取或设置是否显示上下调节按钮。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXNumericBox.Unit">
+            <summary>
+            获取或设置数值后方显示的单位文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNumericBox.OnApplyTemplate">
+            <summary>
+            应用控件模板，并挂接上下调节按钮事件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNumericBox.OnPreviewTextInput(System.Windows.Input.TextCompositionEventArgs)">
+            <summary>
+            限制键盘输入，只允许形成合法数字的字符进入文本框。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNumericBox.OnKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            处理上下方向键步进调整数值。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNumericBox.OnLostKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs)">
+            <summary>
+            失去焦点时提交文本，并按格式化规则回写显示文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXNumericBox.OnTextChanged(System.Windows.Controls.TextChangedEventArgs)">
+            <summary>
+            文本变化时同步数值，避免绑定端等到失焦才收到更新。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPathPickerMode">
+            <summary>
+            路径选择模式，用于决定打开文件选择对话框还是文件夹选择对话框。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPickerMode.File">
+            <summary>
+            文件选择模式。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPickerMode.Folder">
+            <summary>
+            文件夹选择模式。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPathPicker">
+            <summary>
+            路径选择控件，包含文本输入框和浏览按钮，可选择文件或文件夹。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPicker.PathProperty">
+            <summary>
+            当前路径依赖属性，默认支持双向绑定。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPicker.ModeProperty">
+            <summary>
+            路径选择模式依赖属性，用于切换文件选择和文件夹选择。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPicker.FilterProperty">
+            <summary>
+            文件筛选器依赖属性，仅在文件选择模式下生效。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPicker.DialogTitleProperty">
+            <summary>
+            对话框标题依赖属性，用于提示当前选择目的。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPicker.BrowseButtonTextProperty">
+            <summary>
+            浏览按钮文本依赖属性，默认显示省略号。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPathPicker.IsTextReadOnlyProperty">
+            <summary>
+            文本框是否只读依赖属性，只读时只能通过浏览按钮改变路径。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPathPicker.Path">
+            <summary>
+            获取或设置当前选择的文件路径或文件夹路径。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPathPicker.Mode">
+            <summary>
+            获取或设置当前路径选择模式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPathPicker.Filter">
+            <summary>
+            获取或设置文件选择器筛选条件，例如 Images|*.png;*.jpg。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPathPicker.DialogTitle">
+            <summary>
+            获取或设置弹出选择对话框的标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPathPicker.BrowseButtonText">
+            <summary>
+            获取或设置浏览按钮显示文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPathPicker.IsTextReadOnly">
+            <summary>
+            获取或设置内部文本框是否只读。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPathPicker.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定浏览按钮点击事件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXFilePicker">
+            <summary>
+            文件路径选择控件，默认使用文件选择模式。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXFilePicker.#ctor">
+            <summary>
+            初始化文件选择控件并固定为文件模式。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXFolderPicker">
+            <summary>
+            文件夹路径选择控件，默认使用文件夹选择模式。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXFolderPicker.#ctor">
+            <summary>
+            初始化文件夹选择控件并固定为文件夹模式。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXDialog">
+            <summary>
+            可承载自定义内容的弹窗控件，通常覆盖在当前页面根 Grid 内使用。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.ConfirmEvent">
+            <summary>标识 <see cref="E:TX.WpfUI.Controls.TXDialog.Confirm"/> 路由事件。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.CancelEvent">
+            <summary>标识 <see cref="E:TX.WpfUI.Controls.TXDialog.Cancel"/> 路由事件。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.IsOpenProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.IsOpen"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.HeaderProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.Header"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.TitleProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.Title"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.FooterProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.Footer"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.DialogWidthProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.DialogWidth"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.CloseOnMaskClickProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.CloseOnMaskClick"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.ShowCloseButtonProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.ShowCloseButton"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.ConfirmCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.ConfirmCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXDialog.CancelCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXDialog.CancelCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDialog.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXDialog"/> 的新实例，并提供默认确认、取消命令。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXDialog.Confirm">
+            <summary>
+            单击确认按钮或执行确认命令时引发。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXDialog.Cancel">
+            <summary>
+            单击取消、关闭按钮或遮罩关闭时引发。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.IsOpen">
+            <summary>
+            获取或设置弹窗是否打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.Header">
+            <summary>
+            获取或设置标题区域内容；设置后可替代默认标题文本布局。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.Title">
+            <summary>
+            获取或设置默认标题文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.Footer">
+            <summary>
+            获取或设置底部区域内容，通常承载操作按钮。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.DialogWidth">
+            <summary>
+            获取或设置弹窗面板宽度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.CloseOnMaskClick">
+            <summary>
+            获取或设置点击遮罩时是否关闭弹窗。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.ShowCloseButton">
+            <summary>
+            获取或设置是否显示右上角关闭按钮。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.ConfirmCommand">
+            <summary>
+            获取或设置确认命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXDialog.CancelCommand">
+            <summary>
+            获取或设置取消命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXDialog.OnApplyTemplate">
+            <summary>
+            应用控件模板，并挂接遮罩、标题拖拽和关闭按钮事件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPagination">
+            <summary>
+            分页控件，提供总数、页码、页大小、首页/上一页/下一页/末页命令和页码集合。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.TotalProperty">
+            <summary>
+            数据总数依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.PageIndexProperty">
+            <summary>
+            当前页码依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.PageSizeProperty">
+            <summary>
+            每页数量依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.PageCountProperty">
+            <summary>
+            总页数依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.DisplayPageCountProperty">
+            <summary>
+            显示页码数量依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.PageSizeOptionsProperty">
+            <summary>
+            每页数量选项依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.IsTotalVisibleProperty">
+            <summary>
+            总数文本是否可见依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.IsPageSizeSelectorVisibleProperty">
+            <summary>
+            每页数量选择器是否可见依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.TotalTextProperty">
+            <summary>
+            总数显示文本依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.CanMovePreviousProperty">
+            <summary>
+            是否可以向前翻页依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPagination.CanMoveNextProperty">
+            <summary>
+            是否可以向后翻页依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPagination.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXPagination"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.Total">
+            <summary>
+            获取或设置数据总数。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.PageIndex">
+            <summary>
+            获取或设置当前页码，从 1 开始。该属性支持双向绑定。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.PageSize">
+            <summary>
+            获取或设置每页数据量。该属性支持双向绑定。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.PageCount">
+            <summary>
+            获取总页数。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.DisplayPageCount">
+            <summary>
+            获取或设置最多显示的页码按钮数量。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.PageSizeOptions">
+            <summary>
+            获取或设置页大小候选集合。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.IsTotalVisible">
+            <summary>
+            获取或设置是否显示总数文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.IsPageSizeSelectorVisible">
+            <summary>
+            获取或设置是否显示页大小选择器。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.TotalText">
+            <summary>
+            获取总数显示文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.CanMovePrevious">
+            <summary>
+            获取是否可以向前翻页。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.CanMoveNext">
+            <summary>
+            获取是否可以向后翻页。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.PageItems">
+            <summary>
+            获取当前需要显示的页码项集合。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.FirstPageCommand">
+            <summary>
+            获取跳转第一页命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.PreviousPageCommand">
+            <summary>
+            获取跳转上一页命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.NextPageCommand">
+            <summary>
+            获取跳转下一页命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.LastPageCommand">
+            <summary>
+            获取跳转最后一页命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPagination.SelectPageCommand">
+            <summary>
+            获取选择页码命令。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPaginationItem">
+            <summary>
+            分页控件中的页码项，可能是真实页码，也可能是省略号。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXPaginationItem.PropertyChanged">
+            <summary>
+            在属性值发生变化时发生。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPaginationItem.PageNumber">
+            <summary>
+            获取页码。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPaginationItem.Text">
+            <summary>
+            获取显示文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPaginationItem.IsEllipsis">
+            <summary>
+            获取是否为省略号。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPaginationItem.IsCurrent">
+            <summary>
+            获取或设置是否为当前页。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPaginationItem.CreatePage(System.Int32,System.Boolean)">
+            <summary>
+            创建普通页码项。
+            </summary>
+            <param name="pageNumber">页码。</param>
+            <param name="isCurrent">是否为当前页。</param>
+            <returns>创建的页码项。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPaginationItem.CreateEllipsis">
+            <summary>
+            创建省略号页码项。
+            </summary>
+            <returns>创建的省略号项。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPropertyGrid">
+            <summary>
+            属性表格控件，基于 TypeDescriptor 读取对象属性并按分类展示。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPropertyGrid.SelectedObjectProperty">
+            <summary>
+            当前选中对象依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPropertyGrid.ShowReadOnlyPropertiesProperty">
+            <summary>
+            是否显示只读属性依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPropertyGrid.ItemsProperty">
+            <summary>
+            属性项集合依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPropertyGrid.GroupsProperty">
+            <summary>
+            属性分组集合依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPropertyGrid.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXPropertyGrid"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGrid.SelectedObject">
+            <summary>
+            获取或设置需要展示属性的对象。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGrid.ShowReadOnlyProperties">
+            <summary>
+            获取或设置是否显示只读属性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGrid.Items">
+            <summary>
+            获取扁平属性项集合。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGrid.Groups">
+            <summary>
+            获取按分类分组后的属性集合。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPropertyGrid.Refresh">
+            <summary>
+            重新读取当前对象属性并刷新展示集合。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPropertyGridGroup">
+            <summary>
+            属性表格中的分组。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPropertyGridGroup.#ctor(System.String)">
+            <summary>
+            执行TXProperty Grid Group逻辑。
+            </summary>
+            <param name="name">name 参数。</param>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridGroup.Name">
+            <summary>
+            获取名称。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridGroup.IsExpanded">
+            <summary>
+            获取或设置是否展开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridGroup.Items">
+            <summary>
+            获取属性项集合。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPropertyGridItem">
+            <summary>
+            属性表格中的单个属性项，负责读取和写入目标对象属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPropertyGridItem.#ctor(System.Object,System.ComponentModel.PropertyDescriptor)">
+            <summary>
+            执行TXProperty Grid Item逻辑。
+            </summary>
+            <param name="target">target 参数。</param>
+            <param name="descriptor">descriptor 参数。</param>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXPropertyGridItem.PropertyChanged">
+            <summary>
+            在属性值发生变化时发生。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.Name">
+            <summary>
+            获取或设置名称。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.Category">
+            <summary>
+            获取或设置分类。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.Description">
+            <summary>
+            获取或设置说明。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.IsReadOnly">
+            <summary>
+            获取或设置是否只读。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.IsBoolean">
+            <summary>
+            获取或设置Is Boolean。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.IsEnum">
+            <summary>
+            获取或设置Is Enum。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.EnumValues">
+            <summary>
+            获取或设置Enum Values。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.Value">
+            <summary>
+            获取或设置属性值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.BooleanValue">
+            <summary>
+            获取或设置Boolean Value。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPropertyGridItem.ValueString">
+            <summary>
+            获取或设置属性值文本。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXProgressShape">
+            <summary>
+            进度条形态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressShape.Horizontal">
+            <summary>水平进度条。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressShape.Circle">
+            <summary>圆形进度条。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXProgressBar">
+            <summary>
+            自绘进度条，支持水平和圆形两种形态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.MinimumProperty">
+            <summary>
+            最小值依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.MaximumProperty">
+            <summary>
+            最大值依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.ValueProperty">
+            <summary>
+            属性值依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.ProgressShapeProperty">
+            <summary>
+            Progress Shape依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.ShowTextProperty">
+            <summary>
+            是否显示文本依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.TextFormatProperty">
+            <summary>
+            文本格式依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.TrackColorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXProgressBar.TrackColor"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.ProgressColorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXProgressBar.ProgressColor"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.TextColorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXProgressBar.TextColor"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.ProgressTextColorProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXProgressBar.ProgressTextColor"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.StrokeThicknessProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXProgressBar.StrokeThickness"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXProgressBar.RadiusProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXProgressBar.Radius"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.Minimum">
+            <summary>
+            获取或设置最小值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.Maximum">
+            <summary>
+            获取或设置最大值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.Value">
+            <summary>
+            获取或设置当前值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.ProgressShape">
+            <summary>
+            获取或设置进度条形态。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.TrackColor">
+            <summary>
+            获取或设置轨道颜色。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.ProgressColor">
+            <summary>
+            获取或设置进度颜色。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.TextColor">
+            <summary>
+            获取或设置普通文本颜色。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.ProgressTextColor">
+            <summary>
+            获取或设置覆盖在进度区域上的文本颜色。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.ShowText">
+            <summary>
+            获取或设置是否显示进度文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.TextFormat">
+            <summary>
+            获取或设置进度文本格式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.StrokeThickness">
+            <summary>
+            获取或设置圆形进度条线宽。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXProgressBar.Radius">
+            <summary>
+            获取或设置水平进度条圆角半径。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXProgressBar.MeasureOverride(System.Windows.Size)">
+            <summary>
+            测量控件所需的布局尺寸。
+            </summary>
+            <param name="constraint">constraint 参数。</param>
+            <returns>控件期望占用的尺寸。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXProgressBar.OnRender(System.Windows.Media.DrawingContext)">
+            <summary>
+            绘制控件视觉内容。
+            </summary>
+            <param name="drawingContext">用于绘制内容的绘图上下文。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXRangeSlider">
+            <summary>
+            双滑块范围选择控件，用于选择一个最小值和最大值之间的连续范围。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.MinimumProperty">
+            <summary>
+            最小值依赖属性，改变后会自动校正上下限滑块位置。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.MaximumProperty">
+            <summary>
+            最大值依赖属性，改变后会自动校正上下限滑块位置。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.LowerValueProperty">
+            <summary>
+            下限值依赖属性，默认支持双向绑定并参与重绘。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.UpperValueProperty">
+            <summary>
+            上限值依赖属性，默认支持双向绑定并参与重绘。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.TrackBrushProperty">
+            <summary>
+            未选中轨道画刷依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.RangeBrushProperty">
+            <summary>
+            已选中范围轨道画刷依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.ThumbBrushProperty">
+            <summary>
+            滑块填充画刷依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.ThumbBorderBrushProperty">
+            <summary>
+            滑块边框画刷依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXRangeSlider.ShowValueTextProperty">
+            <summary>
+            是否显示当前上下限数值文本的依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXRangeSlider.#ctor">
+            <summary>
+            初始化范围滑块并启用键盘焦点，方便通过方向键调整范围。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.Minimum">
+            <summary>
+            获取或设置范围滑块允许的最小值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.Maximum">
+            <summary>
+            获取或设置范围滑块允许的最大值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.LowerValue">
+            <summary>
+            获取或设置当前选中范围的下限值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.UpperValue">
+            <summary>
+            获取或设置当前选中范围的上限值。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.TrackBrush">
+            <summary>
+            获取或设置未选中轨道的画刷。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.RangeBrush">
+            <summary>
+            获取或设置已选中范围轨道的画刷。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.ThumbBrush">
+            <summary>
+            获取或设置滑块圆点的填充画刷。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.ThumbBorderBrush">
+            <summary>
+            获取或设置滑块圆点的边框画刷。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXRangeSlider.ShowValueText">
+            <summary>
+            获取或设置是否在滑块上方显示上下限数值。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXRangeSlider.OnRender(System.Windows.Media.DrawingContext)">
+            <summary>
+            绘制轨道、选中范围、两个滑块圆点以及可选的数值文本。
+            </summary>
+            <param name="drawingContext">WPF 绘图上下文。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXRangeSlider.OnMouseDown(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            鼠标按下时捕获最近的滑块，并立即根据点击位置更新对应数值。
+            </summary>
+            <param name="e">鼠标按下事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXRangeSlider.OnMouseMove(System.Windows.Input.MouseEventArgs)">
+            <summary>
+            鼠标拖动时持续更新当前激活滑块的值。
+            </summary>
+            <param name="e">鼠标移动事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXRangeSlider.OnMouseUp(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            鼠标松开时释放捕获并结束拖动。
+            </summary>
+            <param name="e">鼠标松开事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXRangeSlider.OnKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            处理方向键微调，左键调整下限，右键调整上限。
+            </summary>
+            <param name="e">键盘事件参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXRelayCommand">
+            <summary>
+            控件库内部使用的轻量命令实现。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSegmentedControl">
+            <summary>
+            分段选择控件，用于在一组互斥选项中选择一个值，例如时间范围、视图模式或状态筛选。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSegmentedControl.#cctor">
+            <summary>
+            注册默认样式键，使控件可以自动加载 Themes/Controls/TXSegmentedControl.xaml 中的模板。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSegmentedControl.#ctor">
+            <summary>
+            初始化分段控件，默认使用单选模式，符合 SegmentedControl 的常见交互。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSegmentedControl.GetContainerForItemOverride">
+            <summary>
+            为普通数据项创建专用分段项容器，确保模板和选中态样式一致。
+            </summary>
+            <returns>用于承载数据项的 <see cref="T:TX.WpfUI.Controls.TXSegmentedControlItem"/>。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSegmentedControl.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断当前数据项是否已经是分段项容器，避免重复包裹用户手写的 TXSegmentedControlItem。
+            </summary>
+            <param name="item">待判断的数据项或控件项。</param>
+            <returns>如果已经是 TXSegmentedControlItem 则返回 true，否则返回 false。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSegmentedControlItem">
+            <summary>
+            分段选择控件的单个选项容器，负责承载文本、图标或任意 WPF 内容。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSegmentedControlItem.#cctor">
+            <summary>
+            注册默认样式键，使分段项可以自动应用选中、悬停和禁用态模板。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSplitButton">
+            <summary>
+            分裂按钮，左侧执行主操作，右侧打开下拉菜单。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXSplitButton.Click">
+            <summary>
+            主按钮点击事件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.ContentProperty">
+            <summary>
+            内容依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.IconProperty">
+            <summary>
+            图标依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.ButtonTypeProperty">
+            <summary>
+            按钮类型依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.ButtonSizeProperty">
+            <summary>
+            按钮尺寸依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.ButtonShapeProperty">
+            <summary>
+            按钮形状依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.IconPlacementProperty">
+            <summary>
+            图标位置依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.IconSpacingProperty">
+            <summary>
+            图标和内容间距依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.DropDownMaxHeightProperty">
+            <summary>
+            下拉菜单最大高度依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.IsDropDownOpenProperty">
+            <summary>
+            下拉菜单是否打开依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.CommandProperty">
+            <summary>
+            命令依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.CommandParameterProperty">
+            <summary>
+            命令参数依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSplitButton.CommandTargetProperty">
+            <summary>
+            命令目标依赖属性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.Content">
+            <summary>
+            获取或设置主按钮显示内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.Icon">
+            <summary>
+            获取或设置主按钮图标。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.ButtonType">
+            <summary>
+            获取或设置按钮语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.ButtonSize">
+            <summary>
+            获取或设置按钮尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.ButtonShape">
+            <summary>
+            获取或设置按钮形状。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.IconPlacement">
+            <summary>
+            获取或设置图标相对内容的位置。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.IconSpacing">
+            <summary>
+            获取或设置图标与内容之间的间距。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.DropDownMaxHeight">
+            <summary>
+            获取或设置下拉菜单最大高度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.IsDropDownOpen">
+            <summary>
+            获取或设置下拉菜单是否打开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.Command">
+            <summary>
+            获取或设置主按钮命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.CommandParameter">
+            <summary>
+            获取或设置主按钮命令参数。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSplitButton.CommandTarget">
+            <summary>
+            获取或设置路由命令目标。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSplitButton.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定模板部件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSplitButton.OnActionClick">
+            <summary>
+            执行主按钮点击逻辑，包括命令执行和 Click 事件触发。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSplitButton.GetContainerForItemOverride">
+            <summary>
+            创建当前控件使用的项目容器。
+            </summary>
+            <returns>创建的项目容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSplitButton.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断项目是否已经是当前控件的项目容器。
+            </summary>
+            <param name="item">当前项目。</param>
+            <returns>如果项目已经是容器则为 true；否则为 false。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSplitButtonAction">
+            <summary>
+            分裂按钮模板内部使用的主操作按钮。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXStepBarItemState">
+            <summary>
+            步骤条中单个步骤的状态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItemState.Waiting">
+            <summary>等待执行。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItemState.Current">
+            <summary>当前步骤。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItemState.Completed">
+            <summary>已完成。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItemState.Error">
+            <summary>错误状态。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXStepBar">
+            <summary>
+            步骤条控件，用于展示流程进度，例如注册、审核、发布等线性步骤。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBar.CurrentIndexProperty">
+            <summary>
+            当前步骤索引依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBar.OrientationProperty">
+            <summary>
+            排列方向依赖属性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBar.CurrentIndex">
+            <summary>
+            获取或设置当前步骤索引。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBar.Orientation">
+            <summary>
+            获取或设置排列方向。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXStepBar.GetContainerForItemOverride">
+            <summary>
+            创建当前控件使用的项目容器。
+            </summary>
+            <returns>创建的项目容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXStepBar.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断项目是否已经是当前控件的项目容器。
+            </summary>
+            <param name="item">当前项目。</param>
+            <returns>如果项目已经是容器则为 true；否则为 false。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXStepBar.PrepareContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            准备项目容器并同步相关状态。
+            </summary>
+            <param name="element">进入编辑状态的元素。</param>
+            <param name="item">当前项目。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXStepBar.ClearContainerForItemOverride(System.Windows.DependencyObject,System.Object)">
+            <summary>
+            清理项目容器状态。
+            </summary>
+            <param name="element">进入编辑状态的元素。</param>
+            <param name="item">当前项目。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXStepBar.OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            处理项目集合变化。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXStepBarItem">
+            <summary>
+            步骤条中的单个步骤项。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItem.TitleProperty">
+            <summary>
+            标题依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItem.DescriptionProperty">
+            <summary>
+            说明依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItem.IndexProperty">
+            <summary>
+            索引依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItem.DisplayIndexProperty">
+            <summary>
+            显示索引依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItem.StateProperty">
+            <summary>
+            步骤状态依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStepBarItem.IsLastProperty">
+            <summary>
+            是否为最后一步依赖属性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBarItem.Title">
+            <summary>
+            获取或设置标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBarItem.Description">
+            <summary>
+            获取或设置说明。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBarItem.Index">
+            <summary>
+            获取或设置索引。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBarItem.DisplayIndex">
+            <summary>
+            获取或设置显示索引。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBarItem.State">
+            <summary>
+            获取或设置步骤状态。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXStepBarItem.IsLast">
+            <summary>
+            获取或设置是否为最后一步。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXStatusType">
+            <summary>
+            TX.WpfUI 轻量展示控件的语义类型。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStatusType.Default">
+            <summary>默认中性色。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStatusType.Primary">
+            <summary>主色。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStatusType.Success">
+            <summary>成功色。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStatusType.Warning">
+            <summary>警告色。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXStatusType.Danger">
+            <summary>危险色。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXBadgeSize">
+            <summary>
+            徽标尺寸。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBadgeSize.Small">
+            <summary>小尺寸。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBadgeSize.Medium">
+            <summary>中等尺寸。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBadgeSize.Large">
+            <summary>大尺寸。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXAvatarShape">
+            <summary>
+            头像形状。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatarShape.Circle">
+            <summary>圆形。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatarShape.Rounded">
+            <summary>圆角矩形。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatarShape.Square">
+            <summary>直角矩形。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXBadge">
+            <summary>
+            徽标控件，用于展示状态、计数或提示点。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBadge.BadgeTypeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBadge.BadgeType"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBadge.BadgeSizeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBadge.BadgeSize"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXBadge.IsDotProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXBadge.IsDot"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBadge.BadgeType">
+            <summary>
+            获取或设置徽标语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBadge.BadgeSize">
+            <summary>
+            获取或设置徽标尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXBadge.IsDot">
+            <summary>
+            获取或设置是否仅显示为提示点。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTag">
+            <summary>
+            标签控件，用于展示可关闭的状态、分类或筛选条件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTag.TagTypeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTag.TagType"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTag.IsClosableProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTag.IsClosable"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTag.CloseCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTag.CloseCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTag.CloseCommandParameterProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTag.CloseCommandParameter"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTag.CloseEvent">
+            <summary>标识 <see cref="E:TX.WpfUI.Controls.TXTag.Close"/> 路由事件。</summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXTag.Close">
+            <summary>
+            标签关闭时触发。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTag.TagType">
+            <summary>
+            获取或设置标签语义类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTag.IsClosable">
+            <summary>
+            获取或设置是否显示关闭按钮。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTag.CloseCommand">
+            <summary>
+            获取或设置关闭命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTag.CloseCommandParameter">
+            <summary>
+            获取或设置关闭命令参数。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTag.OnApplyTemplate">
+            <summary>
+            应用控件模板，并挂接关闭按钮事件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTag.OnContentChanged(System.Object,System.Object)">
+            <summary>
+            内容变化后刷新关闭命令状态。
+            </summary>
+            <param name="oldContent">旧内容。</param>
+            <param name="newContent">新内容。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXAvatar">
+            <summary>
+            头像控件，支持图片、文字占位和不同形状。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatar.ImageSourceProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXAvatar.ImageSource"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatar.TextProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXAvatar.Text"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatar.AvatarSizeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXAvatar.AvatarSize"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXAvatar.AvatarShapeProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXAvatar.AvatarShape"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXAvatar.ImageSource">
+            <summary>
+            获取或设置头像图片。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXAvatar.Text">
+            <summary>
+            获取或设置无图片时显示的文字。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXAvatar.AvatarSize">
+            <summary>
+            获取或设置头像尺寸。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXAvatar.AvatarShape">
+            <summary>
+            获取或设置头像形状。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXEmpty">
+            <summary>
+            空状态控件，用于展示无数据、无权限或暂无结果等页面状态。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXEmpty.IconProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXEmpty.Icon"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXEmpty.TitleProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXEmpty.Title"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXEmpty.DescriptionProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXEmpty.Description"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXEmpty.ActionContentProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXEmpty.ActionContent"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXEmpty.ActionCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXEmpty.ActionCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXEmpty.ActionCommandParameterProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXEmpty.ActionCommandParameter"/> 依赖属性。</summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXEmpty.Icon">
+            <summary>
+            获取或设置空状态图标。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXEmpty.Title">
+            <summary>
+            获取或设置空状态标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXEmpty.Description">
+            <summary>
+            获取或设置空状态说明。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXEmpty.ActionContent">
+            <summary>
+            获取或设置行动按钮内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXEmpty.ActionCommand">
+            <summary>
+            获取或设置行动按钮命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXEmpty.ActionCommandParameter">
+            <summary>
+            获取或设置行动按钮命令参数。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSvgIcon">
+            <summary>
+            直接从 SVG 文件或文本绘制 path 图标的轻量控件，适合 iconfont 等 path 型 SVG。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSvgIcon.SourceProperty">
+            <summary>
+            图标源依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSvgIcon.SvgTextProperty">
+            <summary>
+            SVG 文本依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSvgIcon.FillProperty">
+            <summary>
+            填充画刷依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSvgIcon.StretchProperty">
+            <summary>
+            拉伸方式依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSvgIcon.PreserveSvgFillProperty">
+            <summary>
+            是否保留 SVG 原始填充依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSvgIcon.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXSvgIcon"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSvgIcon.Source">
+            <summary>
+            SVG 文件路径，支持绝对路径、相对资源路径和 pack URI。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSvgIcon.SvgText">
+            <summary>
+            直接传入的 SVG XML 文本。设置后优先于 Source。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSvgIcon.Fill">
+            <summary>
+            统一覆盖 SVG path 的填充色。为空时使用 SVG 自身的 fill。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSvgIcon.Stretch">
+            <summary>
+            SVG 内容适配控件尺寸的方式。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSvgIcon.PreserveSvgFill">
+            <summary>
+            为 true 时优先保留 SVG 文件中的 fill；为 false 时 Fill 会覆盖所有 path。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSvgIcon.BaseUri">
+            <summary>
+            获取或设置基础 URI。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSvgIcon.MeasureOverride(System.Windows.Size)">
+            <summary>
+            测量控件所需的布局尺寸。
+            </summary>
+            <param name="availableSize">布局系统提供的可用尺寸。</param>
+            <returns>控件期望占用的尺寸。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSvgIcon.OnRender(System.Windows.Media.DrawingContext)">
+            <summary>
+            绘制控件视觉内容。
+            </summary>
+            <param name="drawingContext">用于绘制内容的绘图上下文。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSideToastType">
+            <summary>
+            侧边通知类型，用于切换图标和颜色语义。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastType.Info">
+            <summary>普通信息。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastType.Success">
+            <summary>成功信息。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastType.Warning">
+            <summary>警告信息。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastType.Fault">
+            <summary>故障或错误信息。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSideToastPlacement">
+            <summary>
+            侧边通知出现的位置。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastPlacement.Left">
+            <summary>左侧。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastPlacement.Right">
+            <summary>右侧。</summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSideToastEventArgs">
+            <summary>
+            侧边通知事件参数，携带触发事件的通知项。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastEventArgs.#ctor(System.Windows.RoutedEvent,TX.WpfUI.Controls.TXSideToastItem)">
+            <summary>
+            初始化侧边通知事件参数。
+            </summary>
+            <param name="routedEvent">当前触发的路由事件。</param>
+            <param name="item">触发事件的通知项。</param>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastEventArgs.Item">
+            <summary>
+            获取触发事件的通知项。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSideToastItem">
+            <summary>
+            单条侧边通知项，支持自动关闭、确认、取消和关闭事件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.ConfirmedEvent">
+            <summary>
+            确认路由事件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.CancelledEvent">
+            <summary>
+            取消路由事件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.ClosedEvent">
+            <summary>
+            关闭路由事件。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.TitleProperty">
+            <summary>
+            标题依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.MessageProperty">
+            <summary>
+            正文依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.ToastTypeProperty">
+            <summary>
+            通知类型依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.PlacementProperty">
+            <summary>
+            出现位置依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.AutoCloseSecondsProperty">
+            <summary>
+            自动关闭秒数依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.RequiresConfirmationProperty">
+            <summary>
+            是否需要人工确认依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.IconProperty">
+            <summary>
+            图标依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.CloseCommandProperty">
+            <summary>
+            关闭命令依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.ConfirmCommandProperty">
+            <summary>
+            确认命令依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.CancelCommandProperty">
+            <summary>
+            取消命令依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.closeTimer">
+            <summary>
+            自动关闭计时器。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastItem.isClosing">
+            <summary>
+            标记当前通知是否已经进入关闭流程，避免重复触发关闭动画。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastItem.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXSideToastItem"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXSideToastItem.Confirmed">
+            <summary>
+            确认事件。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXSideToastItem.Cancelled">
+            <summary>
+            取消事件。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXSideToastItem.Closed">
+            <summary>
+            关闭事件。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.Title">
+            <summary>
+            获取或设置通知标题。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.Message">
+            <summary>
+            获取或设置通知正文。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.ToastType">
+            <summary>
+            获取或设置通知类型。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.Placement">
+            <summary>
+            获取或设置通知出现位置。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.AutoCloseSeconds">
+            <summary>
+            获取或设置自动关闭秒数；小于等于 0 时不自动关闭。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.RequiresConfirmation">
+            <summary>
+            获取或设置是否需要用户确认。需要确认时不会自动关闭。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.Icon">
+            <summary>
+            获取或设置通知图标。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.CloseCommand">
+            <summary>
+            获取或设置关闭命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.ConfirmCommand">
+            <summary>
+            获取或设置确认命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastItem.CancelCommand">
+            <summary>
+            获取或设置取消命令。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastItem.Confirm">
+            <summary>
+            触发确认事件并关闭通知。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastItem.Cancel">
+            <summary>
+            触发取消事件并关闭通知。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastItem.Close">
+            <summary>
+            关闭通知。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastItem.GetDefaultIcon(TX.WpfUI.Controls.TXSideToastType)">
+            <summary>
+            根据通知类型获取默认图标文本。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSideToastHost">
+            <summary>
+            侧边通知宿主，负责管理一组通知项。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToastHost.PlacementProperty">
+            <summary>
+            通知出现位置依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastHost.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXSideToastHost"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastHost.Placement">
+            <summary>
+            获取或设置通知出现位置。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastHost.Show(System.Object,System.Object,TX.WpfUI.Controls.TXSideToastType,System.Double,System.Boolean)">
+            <summary>
+            在当前宿主中显示一条通知。
+            </summary>
+            <param name="title">通知标题。</param>
+            <param name="message">通知正文。</param>
+            <param name="toastType">通知类型。</param>
+            <param name="autoCloseSeconds">自动关闭秒数，小于等于 0 时不自动关闭。</param>
+            <param name="requiresConfirmation">是否需要人工确认。</param>
+            <returns>新创建的通知项。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSideToast">
+            <summary>
+            侧边通知服务入口，支持在指定窗口内显示或在桌面边缘显示系统级通知。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToast.HostName">
+            <summary>
+            自动挂载到窗口中的通知宿主名称。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSideToast.systemWindow">
+            <summary>
+            系统侧边通知共享窗口。多个系统通知会复用该窗口并在其中堆叠。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToast.ShowIn(System.Windows.Window,System.Object,System.Object,TX.WpfUI.Controls.TXSideToastType,System.Double,System.Boolean)">
+            <summary>
+            在指定窗口中显示通知。
+            </summary>
+            <param name="owner">需要显示通知的窗口。</param>
+            <param name="title">通知标题。</param>
+            <param name="message">通知正文。</param>
+            <param name="toastType">通知类型。</param>
+            <param name="autoCloseSeconds">自动关闭秒数，小于等于 0 时不自动关闭。</param>
+            <param name="requiresConfirmation">是否需要人工确认。</param>
+            <returns>新创建的通知项。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToast.ShowSystem(System.Object,System.Object,TX.WpfUI.Controls.TXSideToastType,System.Double,System.Boolean)">
+            <summary>
+            在桌面边缘显示系统级通知。
+            </summary>
+            <param name="title">通知标题。</param>
+            <param name="message">通知正文。</param>
+            <param name="toastType">通知类型。</param>
+            <param name="autoCloseSeconds">自动关闭秒数，小于等于 0 时不自动关闭。</param>
+            <param name="requiresConfirmation">是否需要人工确认。</param>
+            <returns>新创建的通知项。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToast.GetOrCreateHost(System.Windows.Window)">
+            <summary>
+            获取指定窗口中的通知宿主；不存在时自动创建。
+            </summary>
+            <param name="owner">需要查找或创建宿主的窗口。</param>
+            <returns>通知宿主。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSideToastWindow.#ctor">
+            <summary>
+            初始化系统级侧边通知窗口。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSideToastWindow.Host">
+            <summary>
+            获取系统窗口内部的通知宿主。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSwitchGroup">
+            <summary>
+            开关组选项控件，用于在一组选项中打开或关闭多个值，适合权限、标签筛选和功能开关场景。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSwitchGroup.SelectedValuesTextProperty">
+            <summary>
+            已选项文本，多个值用英文逗号连接，便于在 ViewModel 中用一个字符串进行双向绑定。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.#cctor">
+            <summary>
+            注册默认样式键，使控件可以自动加载 Themes/Controls/TXSwitchGroup.xaml 中的模板。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.#ctor">
+            <summary>
+            初始化开关组，默认允许多选，符合“开关组”同时打开多个选项的使用习惯。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSwitchGroup.SelectedValuesText">
+            <summary>
+            获取或设置逗号拼接的已选项文本，设置后会反向同步到当前选中项。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.GetContainerForItemOverride">
+            <summary>
+            为普通数据项创建专用开关项容器，确保多选状态和视觉样式一致。
+            </summary>
+            <returns>用于承载数据项的 <see cref="T:TX.WpfUI.Controls.TXSwitchGroupItem"/>。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断当前数据项是否已经是开关项容器，避免重复包裹用户手写的 TXSwitchGroupItem。
+            </summary>
+            <param name="item">待判断的数据项或控件项。</param>
+            <returns>如果已经是 TXSwitchGroupItem 则返回 true，否则返回 false。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs)">
+            <summary>
+            当用户点击或键盘切换选项时，把当前 SelectedItems 同步为 SelectedValuesText。
+            </summary>
+            <param name="e">包含新增和移除选中项的事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            当 ItemsSource 或 Items 变化后，重新根据 SelectedValuesText 恢复选中状态。
+            </summary>
+            <param name="e">集合变化事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.SyncSelectedValuesTextFromSelection">
+            <summary>
+            根据已选项集合生成逗号拼接文本，并写回绑定属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.SyncSelectionFromSelectedValuesText(System.String)">
+            <summary>
+            根据逗号或分号分隔的文本恢复选中项，适合从配置或 ViewModel 字符串初始化。
+            </summary>
+            <param name="text">待同步的选项文本。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.GetItemText(System.Object)">
+            <summary>
+            从数据项或手写 ListBoxItem 中提取用于匹配和输出的文本。
+            </summary>
+            <param name="item">待提取文本的数据项。</param>
+            <returns>可显示、可匹配的文本；空项返回空字符串。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroup.OnSelectedValuesTextChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            处理 SelectedValuesText 外部变更，将绑定文本同步到 SelectedItems。
+            </summary>
+            <param name="d">发生变更的开关组控件。</param>
+            <param name="e">依赖属性变更参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSwitchGroupItem">
+            <summary>
+            开关组中的单个选项容器，选中时表现为“已打开”，未选中时表现为“关闭”。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSwitchGroupItem.#cctor">
+            <summary>
+            注册默认样式键，使开关项可以自动应用选中、悬停和禁用态模板。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTabControl">
+            <summary>
+            TX 风格标签页控件，默认使用 <see cref="T:TX.WpfUI.Controls.TXTabItem"/> 作为容器。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTabControl.GetContainerForItemOverride">
+            <summary>
+            创建当前控件使用的项目容器。
+            </summary>
+            <returns>创建的项目容器。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTabControl.IsItemItsOwnContainerOverride(System.Object)">
+            <summary>
+            判断项目是否已经是当前控件的项目容器。
+            </summary>
+            <param name="item">当前项目。</param>
+            <returns>如果项目已经是容器则为 true；否则为 false。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTabItem">
+            <summary>
+            TX 标签页项，支持标题图标、可关闭标签和默认右键关闭菜单。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTabItem.HeaderIconProperty">
+            <summary>
+            页签头部图标依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTabItem.HeaderIconTemplateProperty">
+            <summary>
+            页签头部图标模板依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTabItem.IsClosableProperty">
+            <summary>
+            是否可关闭依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTabItem.CloseEvent">
+            <summary>
+            Close路由事件。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTabItem.HeaderIcon">
+            <summary>
+            获取或设置标题图标。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTabItem.HeaderIconTemplate">
+            <summary>
+            获取或设置标题图标模板。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTabItem.IsClosable">
+            <summary>
+            获取或设置当前标签是否显示关闭按钮。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXTabItem.Close">
+            <summary>
+            关闭事件。事件处理器可将 Handled 设为 true 阻止默认移除逻辑。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTabItem.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定模板部件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTagInput">
+            <summary>
+            标签输入控件，用于录入、展示和删除多个文本标签。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTagInput.TagsTextProperty">
+            <summary>
+            标签文本依赖属性，多个标签使用逗号拼接，默认支持双向绑定。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTagInput.PlaceholderProperty">
+            <summary>
+            占位提示文本依赖属性，仅在没有标签且输入框为空时显示。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTagInput.MaxTagCountProperty">
+            <summary>
+            最大标签数量依赖属性，值为 0 时不限制标签数量。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTagInput.AllowDuplicateProperty">
+            <summary>
+            是否允许重复标签依赖属性，默认不允许忽略大小写的重复项。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTagInput.MaxTagWidthProperty">
+            <summary>
+            单个标签文本最大宽度依赖属性，超出后在模板中以省略号裁剪。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTagInput.#ctor">
+            <summary>
+            初始化标签集合、删除命令和集合到文本的同步逻辑。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.Tags">
+            <summary>
+            获取当前标签集合，集合变化会自动同步到 TagsText。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.RemoveTagCommand">
+            <summary>
+            删除指定标签的命令，供模板中的关闭按钮直接绑定。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.TagsText">
+            <summary>
+            获取或设置逗号拼接的标签文本。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.Placeholder">
+            <summary>
+            获取或设置输入框为空时的占位提示。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.MaxTagCount">
+            <summary>
+            获取或设置最多允许添加的标签数量，0 表示不限制。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.AllowDuplicate">
+            <summary>
+            获取或设置是否允许添加重复标签。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTagInput.MaxTagWidth">
+            <summary>
+            获取或设置单个标签文本的最大显示宽度。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTagInput.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定内部 ItemsControl、输入框和删除按钮事件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTagInput.OnPreviewKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            在控件层兜底处理预览键盘事件，避免内部 TextBox 提前吞掉 Delete 或 Backspace。
+            </summary>
+            <param name="e">键盘事件参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTextBox">
+            <summary>
+            带水印和清除按钮的文本框。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTextBox.WatermarkProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTextBox.Watermark"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTextBox.ClearButtonVisibilityProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXTextBox.ClearButtonVisibility"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTextBox.HasTextProperty">
+            <summary>标识只读 <see cref="P:TX.WpfUI.Controls.TXTextBox.HasText"/> 依赖属性。</summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTextBox.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXTextBox"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTextBox.Watermark">
+            <summary>
+            获取或设置输入为空时显示的水印内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTextBox.ClearButtonVisibility">
+            <summary>
+            获取或设置清除按钮的可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTextBox.HasText">
+            <summary>
+            获取当前文本框是否已有文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTextBox.OnApplyTemplate">
+            <summary>
+            应用控件模板并绑定清除按钮事件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSearchEventArgs">
+            <summary>
+            搜索事件参数，携带当前搜索关键字。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSearchEventArgs.#ctor(System.Windows.RoutedEvent,System.String)">
+            <summary>
+            初始化搜索事件参数。
+            </summary>
+            <param name="routedEvent">关联的路由事件。</param>
+            <param name="query">搜索关键字。</param>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSearchEventArgs.Query">
+            <summary>
+            获取搜索关键字。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXSearchBox">
+            <summary>
+            搜索框，支持按钮点击和回车触发搜索事件或命令。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSearchBox.SearchEvent">
+            <summary>搜索路由事件。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSearchBox.SearchButtonVisibilityProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXSearchBox.SearchButtonVisibility"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSearchBox.SearchCommandProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXSearchBox.SearchCommand"/> 依赖属性。</summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXSearchBox.SearchCommandParameterProperty">
+            <summary>标识 <see cref="P:TX.WpfUI.Controls.TXSearchBox.SearchCommandParameter"/> 依赖属性。</summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXSearchBox.Search">
+            <summary>
+            搜索事件，在点击搜索按钮或按下 Enter 时触发。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSearchBox.SearchButtonVisibility">
+            <summary>
+            获取或设置搜索按钮可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSearchBox.SearchCommand">
+            <summary>
+            获取或设置搜索命令。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXSearchBox.SearchCommandParameter">
+            <summary>
+            获取或设置搜索命令参数；为空时默认使用当前文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSearchBox.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定模板部件。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSearchBox.OnKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            处理按键按下事件。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXSearchBox.OnTextChanged(System.Windows.Controls.TextChangedEventArgs)">
+            <summary>
+            处理文本变化事件。
+            </summary>
+            <param name="e">事件参数。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXPasswordBox">
+            <summary>
+            密码输入框，支持水印、清除按钮、明文查看按钮和可绑定 Password。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.WatermarkProperty">
+            <summary>
+            水印文本依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.ClearButtonVisibilityProperty">
+            <summary>
+            清除按钮可见性依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.PasswordProperty">
+            <summary>
+            密码文本依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.PasswordCharProperty">
+            <summary>
+            密码掩码字符依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.MaxLengthProperty">
+            <summary>
+            最大输入长度依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.IsPasswordRevealedProperty">
+            <summary>
+            是否显示明文密码依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.RevealButtonVisibilityProperty">
+            <summary>
+            显示密码按钮可见性依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXPasswordBox.HasPasswordProperty">
+            <summary>
+            是否已有密码依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPasswordBox.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXPasswordBox"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.Watermark">
+            <summary>
+            获取或设置输入为空时显示的水印内容。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.ClearButtonVisibility">
+            <summary>
+            获取或设置清除按钮可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.Password">
+            <summary>
+            获取或设置密码文本。该属性支持双向绑定。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.PasswordChar">
+            <summary>
+            获取或设置密码掩码字符。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.MaxLength">
+            <summary>
+            获取或设置最大输入长度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.IsPasswordRevealed">
+            <summary>
+            获取或设置是否显示明文密码。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.RevealButtonVisibility">
+            <summary>
+            获取或设置明文查看按钮可见性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXPasswordBox.HasPassword">
+            <summary>
+            获取当前是否已有密码内容。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXPasswordBox.OnApplyTemplate">
+            <summary>
+            套用控件模板并绑定模板部件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTreeDataGrid">
+            <summary>
+            树形表格控件，将树结构数据展开成可虚拟化的扁平行集合。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGrid.TreeItemsSourceProperty">
+            <summary>
+            树形数据源依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGrid.ChildrenPathProperty">
+            <summary>
+            子级集合路径依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGrid.IsExpandedPathProperty">
+            <summary>
+            展开状态路径依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGrid.AutoExpandLevelProperty">
+            <summary>
+            自动展开层级依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGrid.IndentWidthProperty">
+            <summary>
+            缩进宽度依赖属性。
+            </summary>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGrid.VisibleItemCountProperty">
+            <summary>
+            可见项数量依赖属性。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGrid.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXTreeDataGrid"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGrid.TreeItemsSource">
+            <summary>
+            获取或设置树形数据源。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGrid.ChildrenPath">
+            <summary>
+            获取或设置子节点集合属性路径，默认值为 Children。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGrid.IsExpandedPath">
+            <summary>
+            获取或设置节点展开状态属性路径。设置后展开/收起会回写到数据对象。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGrid.AutoExpandLevel">
+            <summary>
+            获取或设置自动展开层级，0 表示不自动展开。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGrid.IndentWidth">
+            <summary>
+            获取或设置每一级树节点缩进宽度。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGrid.VisibleItemCount">
+            <summary>
+            获取当前可见节点数量。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGrid.RefreshTree">
+            <summary>
+            重新构建可见节点集合。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGrid.ExpandAll">
+            <summary>
+            展开全部节点。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGrid.CollapseAll">
+            <summary>
+            收起全部节点。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGrid.OnItemsSourceChanged(System.Collections.IEnumerable,System.Collections.IEnumerable)">
+            <summary>
+            处理数据源变化并刷新显示节点。
+            </summary>
+            <param name="oldValue">变更前的值。</param>
+            <param name="newValue">变更后的值。</param>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTreeDataGridNode">
+            <summary>
+            树形表格内部使用的可见节点包装对象。
+            </summary>
+        </member>
+        <member name="E:TX.WpfUI.Controls.TXTreeDataGridNode.PropertyChanged">
+            <summary>
+            在属性值发生变化时发生。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGridNode.Item">
+            <summary>
+            获取数据项。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGridNode.Level">
+            <summary>
+            获取节点层级。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGridNode.HasChildren">
+            <summary>
+            获取是否包含子节点。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGridNode.IsExpanded">
+            <summary>
+            获取或设置是否展开。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTreeDataGridHierarchyColumn">
+            <summary>
+            树形表格层级列，负责绘制缩进、展开按钮和绑定文本。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridHierarchyColumn.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXTreeDataGridHierarchyColumn"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridHierarchyColumn.GenerateElement(System.Windows.Controls.DataGridCell,System.Object)">
+            <summary>
+            生成单元格显示状态下的内容元素。
+            </summary>
+            <param name="cell">当前数据单元格。</param>
+            <param name="dataItem">当前数据项。</param>
+            <returns>用于显示状态的内容元素。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridHierarchyColumn.GenerateEditingElement(System.Windows.Controls.DataGridCell,System.Object)">
+            <summary>
+            生成单元格编辑状态下的内容元素。
+            </summary>
+            <param name="cell">当前数据单元格。</param>
+            <param name="dataItem">当前数据项。</param>
+            <returns>用于编辑状态的内容元素。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridHierarchyColumn.PrepareCellForEdit(System.Windows.FrameworkElement,System.Windows.RoutedEventArgs)">
+            <summary>
+            准备单元格编辑并返回原始值。
+            </summary>
+            <param name="editingElement">editingElement 参数。</param>
+            <param name="editingEventArgs">触发编辑的路由事件参数。</param>
+            <returns>编辑前的单元格原始值。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTreeDataGridTextColumn">
+            <summary>
+            树形表格文本列，简化绑定到 Item.xxx 的写法。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridTextColumn.#ctor">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Controls.TXTreeDataGridTextColumn"/> 类的新实例。
+            </summary>
+            <returns>方法执行后的结果。</returns>
+        </member>
+        <member name="F:TX.WpfUI.Controls.TXTreeDataGridTextColumn.ItemBindingPathProperty">
+            <summary>
+            数据项绑定路径依赖属性。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Controls.TXTreeDataGridTextColumn.ItemBindingPath">
+            <summary>
+            获取或设置数据项绑定路径。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridTextColumn.GenerateElement(System.Windows.Controls.DataGridCell,System.Object)">
+            <summary>
+            生成单元格显示状态下的内容元素。
+            </summary>
+            <param name="cell">当前数据单元格。</param>
+            <param name="dataItem">当前数据项。</param>
+            <returns>用于显示状态的内容元素。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridTextColumn.GenerateEditingElement(System.Windows.Controls.DataGridCell,System.Object)">
+            <summary>
+            生成单元格编辑状态下的内容元素。
+            </summary>
+            <param name="cell">当前数据单元格。</param>
+            <param name="dataItem">当前数据项。</param>
+            <returns>用于编辑状态的内容元素。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTreeDataGridIndentConverter">
+            <summary>
+            根据节点层级和缩进宽度计算实际缩进。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridIndentConverter.Convert(System.Object[],System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            执行绑定值转换。
+            </summary>
+            <param name="values">需要转换的一组绑定值。</param>
+            <param name="targetType">转换目标类型。</param>
+            <param name="parameter">转换参数。</param>
+            <param name="culture">区域性信息。</param>
+            <returns>转换后的值。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridIndentConverter.ConvertBack(System.Object,System.Type[],System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            执行绑定值反向转换。
+            </summary>
+            <param name="value">需要转换的绑定值。</param>
+            <param name="targetTypes">转换目标类型集合。</param>
+            <param name="parameter">转换参数。</param>
+            <param name="culture">区域性信息。</param>
+            <returns>反向转换后的值。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Controls.TXTreeDataGridBooleanToVisibilityConverter">
+            <summary>
+            将布尔值转换为 Visibility，false 时返回 Hidden 以保留展开按钮位置。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridBooleanToVisibilityConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            执行绑定值转换。
+            </summary>
+            <param name="value">需要转换的绑定值。</param>
+            <param name="targetType">转换目标类型。</param>
+            <param name="parameter">转换参数。</param>
+            <param name="culture">区域性信息。</param>
+            <returns>转换后的值。</returns>
+        </member>
+        <member name="M:TX.WpfUI.Controls.TXTreeDataGridBooleanToVisibilityConverter.ConvertBack(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            执行绑定值反向转换。
+            </summary>
+            <param name="value">需要转换的绑定值。</param>
+            <param name="targetType">转换目标类型。</param>
+            <param name="parameter">转换参数。</param>
+            <param name="culture">区域性信息。</param>
+            <returns>反向转换后的值。</returns>
+        </member>
+        <member name="T:TX.WpfUI.Theming.TXThemeInfo">
+            <summary>
+            描述一个 TX.WpfUI 主题的基础信息。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Theming.TXThemeInfo.#ctor(System.String,System.String,System.Windows.Media.Color)">
+            <summary>
+            初始化 <see cref="T:TX.WpfUI.Theming.TXThemeInfo"/> 的新实例。
+            </summary>
+            <param name="name">主题内部名称，用于持久化或比较。</param>
+            <param name="displayName">主题展示名称。</param>
+            <param name="primaryColor">主题主色。</param>
+        </member>
+        <member name="P:TX.WpfUI.Theming.TXThemeInfo.Name">
+            <summary>
+            获取主题内部名称。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Theming.TXThemeInfo.DisplayName">
+            <summary>
+            获取主题展示名称。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Theming.TXThemeInfo.PrimaryColor">
+            <summary>
+            获取主题主色。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Theming.TXThemeInfo.PreviewBrush">
+            <summary>
+            获取用于界面预览的主色画刷。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Theming.TXThemeInfo.ToString">
+            <summary>
+            返回主题展示名称，便于直接绑定到列表控件。
+            </summary>
+        </member>
+        <member name="T:TX.WpfUI.Theming.TXThemeManager">
+            <summary>
+            TX.WpfUI 运行时主题管理器，负责把主题主色写入应用资源并刷新已创建画刷。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Theming.TXThemeManager.Themes">
+            <summary>
+            获取内置主题列表。
+            </summary>
+        </member>
+        <member name="P:TX.WpfUI.Theming.TXThemeManager.CurrentTheme">
+            <summary>
+            获取当前已应用的主题。
+            </summary>
+        </member>
+        <member name="M:TX.WpfUI.Theming.TXThemeManager.ApplyTheme(TX.WpfUI.Theming.TXThemeInfo)">
+            <summary>
+            应用指定主题，并刷新应用资源中的主色、悬停色、按下色和选择色。
+            </summary>
+            <param name="theme">要应用的主题信息。</param>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,46 @@
+# Visual Studio 用户状态文件
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 构建输出目录
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]ny[Cc][Pp][Uu]/
+
+# .NET 临时和 NuGet 缓存文件
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# 调试符号和运行日志
+*.pdb
+*.log
+*.tlog
+*.lastbuildstate
+*.cache
+
+# 测试和覆盖率输出
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# TXDB 本地便携配置，避免提交连接密码、查询语句和个人主题配置
+connections/
+settings/
+queries/
+
+# Windows 资源管理器文件
+Thumbs.db
+Desktop.ini

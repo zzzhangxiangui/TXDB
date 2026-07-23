@@ -1,0 +1,355 @@
+<Window x:Class="TXDB.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:TXDB.Models"
+        xmlns:tx="clr-namespace:TX.WpfUI.Controls;assembly=TX.WpfUI"
+        mc:Ignorable="d"
+        Title="TXDB"
+        Height="760"
+        Width="1180"
+        MinHeight="620"
+        MinWidth="980"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        Icon="Logo.ico"
+        Closing="MainWindow_Closing"
+        Closed="MainWindow_Closed"
+        Background="{DynamicResource TX.Brush.Background}">
+    <Window.Resources>
+        <!-- 左侧数据库对象树容器样式，使用更紧凑的基础 TreeView 样式。 -->
+        <Style x:Key="DatabaseTreeStyle"
+               TargetType="{x:Type TreeView}"
+               BasedOn="{StaticResource TX.TreeViewStyle}">
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+
+        <!-- 左侧数据库对象树展开箭头样式，缩小默认 32px 箭头高度。 -->
+        <Style x:Key="DatabaseTreeArrowToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Foreground" Value="{StaticResource TX.Brush.TextSecondary}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Background="{TemplateBinding Background}">
+                            <Path x:Name="Arrow"
+                                  Width="5"
+                                  Height="8"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 0 L 5 4 L 0 8 Z"
+                                  Fill="{TemplateBinding Foreground}"
+                                  Stretch="Fill" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Arrow" Property="Data" Value="M 0 1 L 4 5 L 8 1 Z" />
+                                <Setter TargetName="Arrow" Property="Width" Value="8" />
+                                <Setter TargetName="Arrow" Property="Height" Value="5" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource TX.Brush.TextPrimary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 左侧数据库对象树项样式，缩小行高和层级缩进，尽量多显示对象。 -->
+        <Style x:Key="DatabaseTreeItemStyle"
+               TargetType="{x:Type TreeViewItem}">
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource TX.Brush.TextPrimary}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Border x:Name="HeaderRoot"
+                                    MinHeight="{TemplateBinding MinHeight}"
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="{TemplateBinding Background}"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="18" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ToggleButton x:Name="Expander"
+                                                  Grid.Column="0"
+                                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                  Style="{StaticResource DatabaseTreeArrowToggleStyle}" />
+
+                                    <ContentPresenter Grid.Column="1"
+                                                      Margin="0,0,6,0"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      ContentSource="Header"
+                                                      RecognizesAccessKey="True"
+                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </Grid>
+                            </Border>
+
+                            <ItemsPresenter x:Name="ItemsHost"
+                                            Grid.Row="1"
+                                            Margin="18,0,0,0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="False">
+                                <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                            </Trigger>
+                            <Trigger Property="IsExpanded" Value="False">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderRoot" Property="Background" Value="{DynamicResource TX.Brush.SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="HeaderRoot" Property="Background" Value="{DynamicResource TX.Brush.Primary}" />
+                                <Setter TargetName="Expander" Property="Foreground" Value="{StaticResource TX.Brush.White}" />
+                                <Setter Property="Foreground" Value="{StaticResource TX.Brush.White}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True" />
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="HeaderRoot" Property="Background" Value="{DynamicResource TX.Brush.PrimaryHover}" />
+                                <Setter TargetName="Expander" Property="Foreground" Value="{StaticResource TX.Brush.White}" />
+                                <Setter Property="Foreground" Value="{StaticResource TX.Brush.White}" />
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource TX.Brush.TextDisabled}" />
+                                <Setter TargetName="Expander" Property="Foreground" Value="{StaticResource TX.Brush.TextDisabled}" />
+                                <Setter TargetName="HeaderRoot" Property="Opacity" Value="0.62" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 左侧数据库对象树节点模板，图标使用控件库 TXIcon 资源。 -->
+        <HierarchicalDataTemplate DataType="{x:Type models:DatabaseTreeNode}" ItemsSource="{Binding Children}">
+            <Grid Height="22" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <tx:TXIcon Grid.Column="0"
+                           Size="13"
+                           Foreground="{Binding IconBrush}"
+                           VerticalAlignment="Center">
+                    <tx:TXIcon.Style>
+                        <Style TargetType="{x:Type tx:TXIcon}">
+                            <Setter Property="Source" Value="{StaticResource TX.Icon.数据}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.Connection}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.联机失败}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.联机成功}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.Database}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.数据}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.Schema}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.系统}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.TablesFolder}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.文件夹}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.QueriesFolder}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.编码}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.SavedQuery}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.保存}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.Column}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.编辑}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DatabaseObjectKind.Info}">
+                                    <Setter Property="Source" Value="{StaticResource TX.Icon.提示}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </tx:TXIcon.Style>
+                </tx:TXIcon>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Name}"
+                           TextTrimming="CharacterEllipsis"
+                           FontSize="12"
+                           VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Foreground" Value="{DynamicResource TX.Brush.TextPrimary}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding UseCustomTextBrush}" Value="True">
+                                    <Setter Property="Foreground" Value="{Binding TextBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource TX.Brush.White}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <TextBlock Grid.Column="2"
+                           Text="{Binding StatusText}"
+                           FontSize="11"
+                           Margin="8,0,4,0"
+                           VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Foreground" Value="{DynamicResource TX.Brush.TextSecondary}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusText}" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding UseCustomTextBrush}" Value="True">
+                                    <Setter Property="Foreground" Value="{Binding TextBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource TX.Brush.White}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="72" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{DynamicResource TX.Brush.Surface}" BorderBrush="{DynamicResource TX.Brush.Border}" BorderThickness="0,0,0,1">
+            <DockPanel Margin="12,0">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <tx:TXButton x:Name="NewConnectionButton" Content="新建连接" ButtonType="Primary" ButtonSize="Small" IconPlacement="Top" IconSpacing="2" Click="NewConnectionButton_Click" Margin="0,0,8,0" Width="82" Height="56">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.添加}" Size="24" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="ImportConnectionsButton" Content="导入连接" ButtonSize="Small" IconPlacement="Top" IconSpacing="2" Click="ImportConnectionsButton_Click" Margin="0,0,8,0" Width="74" Height="56">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.导入}" Size="20" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="ExportConnectionsButton" Content="导出连接" ButtonSize="Small" IconPlacement="Top" IconSpacing="2" Click="ExportConnectionsButton_Click" Margin="0,0,8,0" Width="74" Height="56">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.下载}" Size="20" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="NewQueryButton" Content="新建查询" ButtonSize="Small" IconPlacement="Top" IconSpacing="2" Click="NewQueryButton_Click" Margin="0,0,8,0" Width="82" Height="56">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.编码}" Size="24" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock x:Name="StatusText"
+                               Visibility="Collapsed"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                               Text="" />
+                    <tx:TXButton x:Name="SqlHelpButton" Content="SQL 帮助" ButtonSize="Small" Margin="0,0,10,0" Click="SqlHelpButton_Click" MinWidth="86" Height="32">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.提示}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <TextBlock Text="主题" Foreground="{DynamicResource TX.Brush.TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <tx:TXComboBox x:Name="ThemeBox"
+                                   Width="138"
+                                   Height="32"
+                                   DisplayMemberPath="DisplayName"
+                                   ClearButtonVisibility="Collapsed"
+                                   SelectionChanged="ThemeBox_SelectionChanged" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" MinWidth="250" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{DynamicResource TX.Brush.Surface}" BorderBrush="{DynamicResource TX.Brush.Border}" BorderThickness="0,0,1,0">
+                <TreeView x:Name="ConnectionTree"
+                          Margin="4"
+                          ItemsSource="{Binding ConnectionNodes}"
+                          ItemContainerStyle="{StaticResource DatabaseTreeItemStyle}"
+                          Style="{StaticResource DatabaseTreeStyle}"
+                          Background="{DynamicResource TX.Brush.Surface}"
+                          BorderThickness="0"
+                          PreviewMouseDoubleClick="ConnectionTree_MouseDoubleClick"
+                          PreviewMouseRightButtonDown="ConnectionTree_PreviewMouseRightButtonDown">
+                    <TreeView.ContextMenu>
+                        <ContextMenu Opened="ConnectionTreeContextMenu_Opened">
+                            <MenuItem x:Name="OpenConnectionMenuItem" Header="打开连接/刷新数据库列表" Click="OpenConnectionMenu_Click" />
+                            <MenuItem x:Name="DisconnectConnectionMenuItem" Header="关闭连接" Click="DisconnectMenu_Click" />
+                            <MenuItem x:Name="OpenDatabaseMenuItem" Header="打开数据库/刷新对象" Click="OpenDatabaseMenu_Click" />
+                            <MenuItem x:Name="CloseDatabaseMenuItem" Header="关闭数据库" Click="CloseDatabaseMenu_Click" />
+                            <Separator x:Name="ObjectActionSeparator" />
+                            <MenuItem x:Name="NewQueryMenuItem" Header="新建查询" Click="NewQueryMenu_Click" />
+                            <MenuItem x:Name="OpenSavedQueryMenuItem" Header="打开查询" Click="OpenSavedQueryMenu_Click" />
+                            <MenuItem x:Name="QueryTopRowsMenuItem" Header="打开表数据" Click="QueryTopRowsMenu_Click" />
+                            <MenuItem x:Name="ViewStructureMenuItem" Header="查看表结构" Click="ViewStructureMenu_Click" />
+                            <Separator x:Name="SavedQuerySeparator" />
+                            <MenuItem x:Name="ImportQueriesMenuItem" Header="导入查询语句" Click="ImportQueriesMenu_Click" />
+                            <MenuItem x:Name="ExportQueriesMenuItem" Header="导出查询语句" Click="ExportQueriesMenu_Click" />
+                            <MenuItem x:Name="RenameSavedQueryMenuItem" Header="重命名查询" Click="RenameSavedQueryMenu_Click" />
+                            <MenuItem x:Name="DeleteSavedQueryMenuItem" Header="删除查询" Click="DeleteSavedQueryMenu_Click" />
+                            <Separator x:Name="CopySeparator" />
+                            <MenuItem x:Name="CopyNameMenuItem" Header="复制名称" Click="CopyNameMenu_Click" />
+                            <MenuItem x:Name="CopyFullNameMenuItem" Header="复制完整名称" Click="CopyFullNameMenu_Click" />
+                            <Separator x:Name="ConnectionEditSeparator" />
+                            <MenuItem x:Name="EditConnectionMenuItem" Header="编辑连接" Click="EditConnectionMenu_Click" />
+                            <MenuItem x:Name="DeleteConnectionMenuItem" Header="删除连接" Click="DeleteConnectionMenu_Click" />
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
+                </TreeView>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource TX.Brush.Border}" />
+
+            <Border Grid.Column="2" Background="{DynamicResource TX.Brush.Background}">
+                <tx:TXTabControl x:Name="MainTabs" Margin="8" />
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

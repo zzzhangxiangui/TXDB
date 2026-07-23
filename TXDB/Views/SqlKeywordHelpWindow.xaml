@@ -1,0 +1,152 @@
+<Window x:Class="TXDB.Views.SqlKeywordHelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tx="clr-namespace:TX.WpfUI.Controls;assembly=TX.WpfUI"
+        Title="SQL 关键字帮助"
+        Width="880"
+        Height="560"
+        MinWidth="760"
+        MinHeight="480"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource TX.Brush.Background}">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="SQL 关键字帮助"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TX.Brush.TextPrimary}"
+                       VerticalAlignment="Center" />
+            <TextBlock Text="左侧选择关键字，右侧查看中文含义、常用语法和示例。"
+                       DockPanel.Dock="Right"
+                       Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                       VerticalAlignment="Center" />
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{DynamicResource TX.Brush.Surface}"
+                    BorderBrush="{DynamicResource TX.Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <ListBox x:Name="KeywordList"
+                         BorderThickness="0"
+                         Background="{DynamicResource TX.Brush.Surface}"
+                         Foreground="{DynamicResource TX.Brush.TextPrimary}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SelectionChanged="KeywordList_SelectionChanged">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <!-- 左侧列表固定成上下两行，避免长关键字和中文含义挤在一起。 -->
+                            <Grid Margin="10,7">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Keyword}"
+                                           FontFamily="Consolas"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TX.Brush.Primary}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding ChineseName}"
+                                           Margin="0,2,0,0"
+                                           Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Background="{DynamicResource TX.Brush.Surface}"
+                    BorderBrush="{DynamicResource TX.Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="16">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock x:Name="TitleText"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TX.Brush.Primary}"
+                                   TextWrapping="Wrap" />
+
+                        <TextBlock x:Name="DescriptionText"
+                                   Margin="0,12,0,0"
+                                   Foreground="{DynamicResource TX.Brush.TextPrimary}"
+                                   TextWrapping="Wrap" />
+
+                        <TextBlock Text="语法"
+                                   Margin="0,18,0,6"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TX.Brush.TextPrimary}" />
+                        <TextBox x:Name="SyntaxText"
+                                 IsReadOnly="True"
+                                 TextWrapping="Wrap"
+                                 BorderThickness="1"
+                                 Padding="10"
+                                 MinHeight="58"
+                                 FontFamily="Consolas"
+                                 Background="{DynamicResource TX.Brush.Background}"
+                                 Foreground="{DynamicResource TX.Brush.TextPrimary}" />
+
+                        <TextBlock Text="示例"
+                                   Margin="0,18,0,6"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TX.Brush.TextPrimary}" />
+                        <TextBox x:Name="ExampleText"
+                                 IsReadOnly="True"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 BorderThickness="1"
+                                 Padding="10"
+                                 MinHeight="100"
+                                 FontFamily="Consolas"
+                                 Background="{DynamicResource TX.Brush.Background}"
+                                 Foreground="{DynamicResource TX.Brush.TextPrimary}" />
+
+                        <TextBlock Text="注意"
+                                   Margin="0,18,0,6"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TX.Brush.TextPrimary}" />
+                        <TextBlock x:Name="NotesText"
+                                   Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,12,0,0">
+            <tx:TXButton Content="关闭"
+                         Width="86"
+                         ButtonSize="Medium"
+                         Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

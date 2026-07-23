@@ -1,0 +1,195 @@
+<UserControl x:Class="TXDB.Views.QueryTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tx="clr-namespace:TX.WpfUI.Controls;assembly=TX.WpfUI"
+             xmlns:views="clr-namespace:TXDB.Views">
+    <Grid Background="{DynamicResource TX.Brush.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="28" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="{DynamicResource TX.Brush.Surface}"
+                BorderBrush="{DynamicResource TX.Brush.Border}"
+                BorderThickness="0,0,0,1"
+                Padding="10,10,10,12"
+                Panel.ZIndex="20">
+            <DockPanel LastChildFill="True">
+                <StackPanel Orientation="Horizontal"
+                            DockPanel.Dock="Right"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="8,0,0,0">
+                    <tx:TXButton x:Name="FormatButton" Content="格式化" ButtonSize="Small" Margin="6,0,0,0" Click="FormatButton_Click" MinWidth="82">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.编辑}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="SaveQueryButton" Content="保存" ButtonType="Primary" ButtonSize="Small" Margin="6,0,0,0" Click="SaveQueryButton_Click" MinWidth="70">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.保存}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="ExecuteButton" Content="运行" ButtonType="Success" ButtonSize="Small" Margin="6,0,0,0" Click="ExecuteButton_Click" MinWidth="82" LoadingContent="执行中">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.播放}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="StopButton" Content="停止" ButtonSize="Small" Margin="6,0,0,0" Click="StopButton_Click" IsEnabled="False" MinWidth="70">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.停止}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                    <tx:TXButton x:Name="ExportButton" Content="导出" ButtonSize="Small" Margin="6,0,0,0" Click="ExportButton_Click" MinWidth="70">
+                        <tx:TXButton.Icon>
+                            <tx:TXIcon Source="{StaticResource TX.Icon.下载}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
+                        </tx:TXButton.Icon>
+                    </tx:TXButton>
+                </StackPanel>
+
+                <WrapPanel VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,12,4">
+                        <TextBlock Text="连接" Foreground="{DynamicResource TX.Brush.TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <tx:TXComboBox x:Name="ConnectionBox"
+                                       Width="180"
+                                       Height="38"
+                                       MaxDropDownHeight="320"
+                                       VerticalAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       ToolTip="{Binding SelectedItem, RelativeSource={RelativeSource Self}}"
+                                       ClearButtonVisibility="Collapsed"
+                                       IsEditable="False"
+                                       IsReadOnly="True"
+                                       SelectionChanged="ConnectionBox_SelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,12,4">
+                        <TextBlock Text="数据库" Foreground="{DynamicResource TX.Brush.TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <tx:TXComboBox x:Name="DatabaseBox"
+                                       Width="160"
+                                       Height="38"
+                                       MaxDropDownHeight="320"
+                                       VerticalAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       ToolTip="{Binding SelectedItem, RelativeSource={RelativeSource Self}}"
+                                       ClearButtonVisibility="Collapsed"
+                                       IsEditable="False"
+                                       IsReadOnly="True"
+                                       SelectionChanged="DatabaseBox_SelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,12,4">
+                        <TextBlock Text="架构" Foreground="{DynamicResource TX.Brush.TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <tx:TXComboBox x:Name="SchemaBox"
+                                       Width="112"
+                                       Height="38"
+                                       MaxDropDownHeight="320"
+                                       VerticalAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       ToolTip="{Binding SelectedItem, RelativeSource={RelativeSource Self}}"
+                                       ClearButtonVisibility="Collapsed"
+                                       IsEditable="False"
+                                       IsReadOnly="True"
+                                       SelectionChanged="SchemaBox_SelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,12,4">
+                        <TextBlock Text="辅助" Foreground="{DynamicResource TX.Brush.TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <tx:TXComboBox x:Name="QuickInsertBox"
+                                       Width="150"
+                                       Height="38"
+                                       MaxDropDownHeight="320"
+                                       VerticalAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       DisplayMemberPath="Title"
+                                       Watermark="快速插入"
+                                       ClearButtonVisibility="Collapsed"
+                                       IsEditable="False"
+                                       IsReadOnly="True"
+                                       SelectionChanged="QuickInsertBox_SelectionChanged" />
+                    </StackPanel>
+                </WrapPanel>
+            </DockPanel>
+        </Border>
+
+        <views:SqlEditorControl x:Name="SqlEditor" Grid.Row="1" Margin="10" />
+
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Background="{DynamicResource TX.Brush.Border}" />
+
+        <Grid Grid.Row="3" Margin="10,4,10,8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="34" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0"
+                    Background="{DynamicResource TX.Brush.Surface}"
+                    BorderBrush="{DynamicResource TX.Brush.Border}"
+                    BorderThickness="1,1,1,0"
+                    CornerRadius="4,4,0,0">
+                <DockPanel Margin="8,0">
+                    <TextBlock Text="结果" FontWeight="SemiBold" Foreground="{DynamicResource TX.Brush.TextPrimary}" VerticalAlignment="Center" />
+                </DockPanel>
+            </Border>
+            <tx:TXDataGrid x:Name="ResultGrid"
+                           Grid.Row="1"
+                           AutoGenerateColumns="True"
+                           IsReadOnly="True"
+                           Density="Compact"
+                           EnableRowVirtualization="True"
+                           EnableColumnVirtualization="True"
+                           VirtualizingPanel.IsVirtualizing="True"
+                           VirtualizingPanel.VirtualizationMode="Recycling"
+                           ScrollViewer.CanContentScroll="True"
+                           ScrollViewer.IsDeferredScrollingEnabled="False"
+                           CanUserSortColumns="True"
+                           CurrentCellChanged="ResultGrid_CurrentCellChanged"
+                           SelectedCellsChanged="ResultGrid_SelectedCellsChanged"
+                           GridLinesVisibility="Horizontal"
+                           HeadersVisibility="Column" />
+        </Grid>
+
+        <Border Grid.Row="4"
+                Background="{DynamicResource TX.Brush.Surface}"
+                BorderBrush="{DynamicResource TX.Brush.Border}"
+                BorderThickness="0,1,0,0">
+            <Grid Margin="10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="MessageText"
+                           Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                           Text="准备就绪"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock x:Name="FieldText"
+                           Grid.Column="1"
+                           VerticalAlignment="Center"
+                           Margin="16,0,12,0"
+                           Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                           Text=""
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                <TextBlock x:Name="SelectionText"
+                           Grid.Column="2"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TX.Brush.TextSecondary}"
+                           Text="第 0 条 / 共 0 条" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
