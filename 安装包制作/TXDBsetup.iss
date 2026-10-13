@@ -26,6 +26,7 @@ Name: zh; MessagesFile: "compiler:Default.isl"
 [Files]
 ; 只打包主程序和运行依赖，不打包 pdb、xml 文档、用户配置、连接信息和保存查询。
 Source: "{#SourceRoot}\TXDB.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SourceRoot}\TXDB.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceRoot}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceRoot}\10940_x86\SQLite.Interop.dll"; DestDir: "{app}\10940_x86"; Flags: ignoreversion
 
