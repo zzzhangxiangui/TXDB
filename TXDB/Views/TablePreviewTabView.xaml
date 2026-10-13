@@ -3,6 +3,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:tx="clr-namespace:TX.WpfUI.Controls;assembly=TX.WpfUI"
              xmlns:views="clr-namespace:TXDB.Views">
+    <UserControl.Resources>
+        <Style x:Key="RecordToolbarButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Margin" Value="1 0" />
+            <Setter Property="Foreground" Value="#646464" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <!--<Setter Property="Cursor" Value="Hand" />-->
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="ButtonBackground"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBackground" Property="Background" Value="#e5f3ff" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBackground" Property="Background" Value="#e5f3ff" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#c0c0c0" />
+                                <Setter TargetName="ButtonBackground" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="RecordToolbarIconStyle" TargetType="{x:Type tx:TXIcon}">
+            <Setter Property="Foreground" Value="#646464" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                             Value="False">
+                    <Setter Property="Foreground" Value="#c0c0c0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid Background="{DynamicResource TX.Brush.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="44" />
@@ -48,16 +96,6 @@
                         <tx:TXButton.Icon>
                             <tx:TXIcon Source="{StaticResource TX.Icon.搜索}"
                                        Size="15"
-                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
-                        </tx:TXButton.Icon>
-                    </tx:TXButton>
-                    <tx:TXButton Content="刷新"
-                                 ButtonSize="Small"
-                                 MinWidth="76"
-                                 Click="RefreshButton_Click"
-                                 Margin="0,0,6,0">
-                        <tx:TXButton.Icon>
-                            <tx:TXIcon Source="{StaticResource TX.Icon.刷新}"
                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type tx:TXButton}}}" />
                         </tx:TXButton.Icon>
                     </tx:TXButton>
@@ -233,7 +271,13 @@
                        Grid.Row="2"
                        Margin="10"
                        AutoGenerateColumns="True"
-                       IsReadOnly="True"
+                       IsReadOnly="False"
+                       CanUserAddRows="False"
+                       CanUserDeleteRows="False"
+                       PreviewMouseLeftButtonDown="ResultGrid_PreviewMouseLeftButtonDown"
+                       PreviewMouseDoubleClick="ResultGrid_PreviewMouseDoubleClick"
+                       PreparingCellForEdit="ResultGrid_PreparingCellForEdit"
+                       CellEditEnding="ResultGrid_CellEditEnding"
                        Density="Compact"
                        EnableRowVirtualization="True"
                        EnableColumnVirtualization="True"
@@ -258,20 +302,43 @@
                 Background="{DynamicResource TX.Brush.Surface}"
                 BorderBrush="{DynamicResource TX.Brush.Border}"
                 BorderThickness="0,1,0,0">
-            <Grid Margin="10,0">
+            <Grid Margin="0,2,0,0" >
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0">
+
+
+                    <Button x:Name="AddRowButton" Style="{StaticResource RecordToolbarButtonStyle}" ToolTip="新增行" Click="AddRowButton_Click">
+                        <tx:TXIcon Style="{StaticResource RecordToolbarIconStyle}" Source="{StaticResource TX.Icon.添加记录}"  Width="12" Height="12"/>
+                    </Button>
+                    <Button x:Name="DeleteRowButton" Style="{StaticResource RecordToolbarButtonStyle}" ToolTip="删除选中行" Click="DeleteRowButton_Click">
+                        <tx:TXIcon Style="{StaticResource RecordToolbarIconStyle}" Source="{StaticResource TX.Icon.删除记录}"  Width="12" Height="12"/>
+                    </Button>
+                    <Button x:Name="CommitChangesButton"  Style="{StaticResource RecordToolbarButtonStyle}" ToolTip="提交更改" Click="CommitChangesButton_Click">
+                        <tx:TXIcon Style="{StaticResource RecordToolbarIconStyle}" Source="{StaticResource TX.Icon.提交更改}"  Width="14" Height="14"/>
+                    </Button>
+                    <Button x:Name="CancelChangesButton" Style="{StaticResource RecordToolbarButtonStyle}" ToolTip="取消当前更改" Click="CancelChangesButton_Click">
+                        <tx:TXIcon Style="{StaticResource RecordToolbarIconStyle}" Source="{StaticResource TX.Icon.取消更改}"  Width="11" Height="11"/>
+                    </Button>
+                    <Button x:Name="RefreshButton" Style="{StaticResource RecordToolbarButtonStyle}" ToolTip="刷新当前页" Click="RefreshButton_Click">
+                        <tx:TXIcon Style="{StaticResource RecordToolbarIconStyle}" Source="{StaticResource TX.Icon.刷新记录}"  Width="12" Height="12"/>
+                    </Button>
+                </StackPanel>
                 <TextBlock x:Name="MessageText"
-                           Grid.Column="0"
+                           Grid.Column="1"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource TX.Brush.TextSecondary}"
                            Text="准备就绪"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock x:Name="FieldText"
-                           Grid.Column="1"
+                           Grid.Column="2"
                            VerticalAlignment="Center"
                            Margin="16,0,12,0"
                            Foreground="{DynamicResource TX.Brush.TextSecondary}"
@@ -279,7 +346,7 @@
                            TextTrimming="CharacterEllipsis"
                            ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
                 <TextBlock x:Name="SelectionText"
-                           Grid.Column="2"
+                           Grid.Column="3"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource TX.Brush.TextSecondary}"
                            Text="第 0 条 / 共 0 条" />

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using TXDB.Models;
 
 namespace TXDB.Views
@@ -52,6 +53,23 @@ namespace TXDB.Views
             PageIndex = pageIndex;
             PageSize = pageSize;
             Filters = filters ?? new List<TableFilterCondition>();
+        }
+    }
+
+    /// <summary>
+    /// 表预览页请求提交行变更时使用的事件参数。
+    /// </summary>
+    public class TableCommitRequestedEventArgs : EventArgs
+    {
+        public ConnectionProfile Profile { get; private set; }
+        public DatabaseObjectNode TableNode { get; private set; }
+        public DataTable Changes { get; private set; }
+
+        public TableCommitRequestedEventArgs(ConnectionProfile profile, DatabaseObjectNode tableNode, DataTable changes)
+        {
+            Profile = profile;
+            TableNode = tableNode;
+            Changes = changes;
         }
     }
 }

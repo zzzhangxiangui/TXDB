@@ -75,7 +75,7 @@ namespace TXDB.Views
         public QueryTabView()
         {
             InitializeComponent();
-            ResultGridHelper.Configure(ResultGrid);
+            ResultGridHelper.ConfigureQueryResult(ResultGrid, true);
             InitializeSqlHelperSelectors();
             SetExecutionState(false);
         }

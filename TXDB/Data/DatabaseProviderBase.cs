@@ -89,6 +89,217 @@ namespace TXDB.Data
         }
 
         /// <summary>
+        /// 在事务中写入表预览页产生的新增、修改和删除行。
+        /// </summary>
+        public virtual int ApplyTableChanges(ConnectionProfile profile, DatabaseObjectNode tableNode, DataTable changes)
+        {
+            if (profile == null || tableNode == null || tableNode.Kind != DatabaseObjectKind.Table)
+            {
+                throw new InvalidOperationException("只有具体数据表支持直接编辑。");
+            }
+
+            if (changes == null || changes.Rows.Count == 0)
+            {
+                return 0;
+            }
+
+            DataTable schema = LoadTableSchema(profile, tableNode);
+            List<string> primaryKeys = new List<string>();
+            foreach (DataRow schemaRow in schema.Rows)
+            {
+                string columnName = Convert.ToString(schemaRow["字段名"]);
+                if (!string.IsNullOrWhiteSpace(columnName) && SameName(Convert.ToString(schemaRow["主键"]), "是"))
+                {
+                    primaryKeys.Add(columnName);
+                }
+            }
+
+            ConnectionProfile writeProfile = profile.Clone();
+            if ((ProviderType == DatabaseProviderType.SqlServer || ProviderType == DatabaseProviderType.MySQL) &&
+                !string.IsNullOrWhiteSpace(tableNode.DatabaseName))
+            {
+                writeProfile.DatabaseName = tableNode.DatabaseName;
+            }
+
+            int affectedRows = 0;
+            using (IDbConnection connection = CreateConnection(writeProfile))
+            {
+                connection.Open();
+                using (IDbTransaction transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach (DataRow row in changes.Rows)
+                        {
+                            if (row.RowState == DataRowState.Added)
+                            {
+                                affectedRows += InsertChangedRow(connection, transaction, tableNode, row);
+                            }
+                            else if (row.RowState == DataRowState.Modified)
+                            {
+                                if (primaryKeys.Count == 0)
+                                {
+                                    throw new InvalidOperationException("该表没有主键，无法安全修改数据行。");
+                                }
+
+                                affectedRows += UpdateChangedRow(connection, transaction, tableNode, row, primaryKeys);
+                            }
+                            else if (row.RowState == DataRowState.Deleted)
+                            {
+                                if (primaryKeys.Count == 0)
+                                {
+                                    throw new InvalidOperationException("该表没有主键，无法安全删除数据行。");
+                                }
+
+                                affectedRows += DeleteChangedRow(connection, transaction, tableNode, row, primaryKeys);
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+
+            return affectedRows;
+        }
+
+        private int InsertChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row)
+        {
+            List<DataColumn> columns = row.Table.Columns.Cast<DataColumn>()
+                .Where(column => row[column] != DBNull.Value)
+                .ToList();
+            if (columns.Count == 0)
+            {
+                throw new InvalidOperationException("新增行至少需要填写一个字段值。");
+            }
+
+            List<object> values = columns.Select(column => row[column]).ToList();
+            string sql = "INSERT INTO " + QuoteTableName(tableNode) + " (" +
+                         string.Join(", ", columns.Select(column => QuoteColumnName(column.ColumnName)).ToArray()) + ") VALUES (" +
+                         BuildWriteParameterList(values.Count) + ")";
+            return ExecuteTableChange(connection, transaction, sql, values);
+        }
+
+        private int UpdateChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> primaryKeys)
+        {
+            List<DataColumn> modifiedColumns = row.Table.Columns.Cast<DataColumn>()
+                .Where(column => !ValuesEqual(row[column, DataRowVersion.Original], row[column, DataRowVersion.Current]))
+                .ToList();
+            if (modifiedColumns.Count == 0)
+            {
+                return 0;
+            }
+
+            List<object> values = new List<object>();
+            List<string> assignments = new List<string>();
+            foreach (DataColumn column in modifiedColumns)
+            {
+                assignments.Add(QuoteColumnName(column.ColumnName) + " = " + BuildWriteParameter(values.Count));
+                values.Add(row[column, DataRowVersion.Current]);
+            }
+
+            string whereClause = BuildPrimaryKeyWhere(row, primaryKeys, DataRowVersion.Original, values);
+            int affected = ExecuteTableChange(connection, transaction,
+                "UPDATE " + QuoteTableName(tableNode) + " SET " + string.Join(", ", assignments.ToArray()) + " WHERE " + whereClause, values);
+            EnsureSingleRowChanged(affected);
+            return affected;
+        }
+
+        private int DeleteChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> primaryKeys)
+        {
+            List<object> values = new List<object>();
+            string whereClause = BuildPrimaryKeyWhere(row, primaryKeys, DataRowVersion.Original, values);
+            int affected = ExecuteTableChange(connection, transaction,
+                "DELETE FROM " + QuoteTableName(tableNode) + " WHERE " + whereClause, values);
+            EnsureSingleRowChanged(affected);
+            return affected;
+        }
+
+        private string BuildPrimaryKeyWhere(DataRow row, IList<string> primaryKeys, DataRowVersion version, IList<object> values)
+        {
+            List<string> conditions = new List<string>();
+            foreach (string key in primaryKeys)
+            {
+                if (!row.Table.Columns.Contains(key))
+                {
+                    throw new InvalidOperationException("结果中缺少主键字段 " + key + "，无法安全写入。");
+                }
+
+                object value = row[key, version];
+                if (value == DBNull.Value)
+                {
+                    conditions.Add(QuoteColumnName(key) + " IS NULL");
+                }
+                else
+                {
+                    conditions.Add(QuoteColumnName(key) + " = " + BuildWriteParameter(values.Count));
+                    values.Add(value);
+                }
+            }
+
+            return string.Join(" AND ", conditions.ToArray());
+        }
+
+        private int ExecuteTableChange(IDbConnection connection, IDbTransaction transaction, string sql, IList<object> values)
+        {
+            using (IDbCommand command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                command.CommandText = sql;
+                for (int index = 0; index < values.Count; index++)
+                {
+                    IDbDataParameter parameter = command.CreateParameter();
+                    parameter.ParameterName = "p" + index;
+                    parameter.Value = values[index] ?? DBNull.Value;
+                    command.Parameters.Add(parameter);
+                }
+
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        private string BuildWriteParameterList(int count)
+        {
+            List<string> parameters = new List<string>();
+            for (int index = 0; index < count; index++)
+            {
+                parameters.Add(BuildWriteParameter(index));
+            }
+
+            return string.Join(", ", parameters.ToArray());
+        }
+
+        private string BuildWriteParameter(int index)
+        {
+            if (ProviderType == DatabaseProviderType.Access)
+            {
+                return "?";
+            }
+
+            return (ProviderType == DatabaseProviderType.Oracle ? ":" : "@") + "p" + index;
+        }
+
+        private static bool ValuesEqual(object left, object right)
+        {
+            return object.Equals(left == DBNull.Value ? null : left, right == DBNull.Value ? null : right);
+        }
+
+        private static void EnsureSingleRowChanged(int affectedRows)
+        {
+            if (affectedRows != 1)
+            {
+                throw new InvalidOperationException(affectedRows == 0
+                    ? "数据行已被其他操作修改或删除，请刷新后重试。"
+                    : "主键条件匹配到多行，事务已取消以避免误改数据。");
+            }
+        }
+
+        /// <summary>
         /// 测试连接是否可以正常打开。
         /// </summary>
         public virtual void TestConnection(ConnectionProfile profile)

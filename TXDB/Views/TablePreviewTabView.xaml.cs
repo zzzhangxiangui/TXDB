@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using TX.WpfUI.Controls;
 using TXDB.Models;
@@ -28,11 +31,15 @@ namespace TXDB.Views
         private bool isUpdatingPagination;
         private bool isLoading;
         private int totalRows;
-
+        private TextBox activeCellEditor;
+        private string activeCellOriginalText;
+        private bool hasUncommittedCellValue;
         /// <summary>
         /// 请求主窗口加载当前页数据。
         /// </summary>
         public event EventHandler<TablePageRequestedEventArgs> PageRequested;
+
+        public event EventHandler<TableCommitRequestedEventArgs> CommitRequested;
 
         /// <summary>
         /// 当前表预览页使用的连接配置。
@@ -116,6 +123,20 @@ namespace TXDB.Views
             PageIndex = 1;
             totalRows = 0;
             TableNameText.Text = BuildTableDisplayName(tableNode);
+            bool canEdit = tableNode != null && tableNode.Kind == DatabaseObjectKind.Table;
+            ResultGrid.IsReadOnly = !canEdit;
+            if (canEdit)
+            {
+                ResultGridHelper.Configure(ResultGrid);
+            }
+            else
+            {
+                ResultGridHelper.ConfigureQueryResult(ResultGrid);
+            }
+
+            AddRowButton.IsEnabled = canEdit;
+            DeleteRowButton.IsEnabled = canEdit;
+            UpdateEditCommandState();
             RefreshFilterColumnOptions();
             ResetInvalidFilterColumns();
             UpdateFilterSummary();
@@ -151,7 +172,22 @@ namespace TXDB.Views
         /// </summary>
         public void SetResult(QueryExecutionResult result)
         {
+            if (resultTable != null)
+            {
+                resultTable.ColumnChanged -= ResultTable_ColumnChanged;
+                resultTable.RowChanged -= ResultTable_RowChanged;
+                resultTable.RowDeleted -= ResultTable_RowDeleted;
+            }
+
             resultTable = result == null ? new DataTable() : result.Table;
+            if (resultTable != null)
+            {
+                resultTable.AcceptChanges();
+                resultTable.ColumnChanged += ResultTable_ColumnChanged;
+                resultTable.RowChanged += ResultTable_RowChanged;
+                resultTable.RowDeleted += ResultTable_RowDeleted;
+            }
+
             ResultGrid.ItemsSource = resultTable == null ? null : resultTable.DefaultView;
             int rowCount = resultTable == null ? 0 : resultTable.Rows.Count;
             totalRows = result != null && result.TotalRows >= 0 ? result.TotalRows : rowCount;
@@ -160,6 +196,7 @@ namespace TXDB.Views
             UpdateFilterSummary();
             UpdatePageState();
             UpdateSelectionStatus();
+            UpdateEditCommandState();
         }
 
         /// <summary>
@@ -261,6 +298,13 @@ namespace TXDB.Views
                 return;
             }
 
+            if (HasPendingChanges())
+            {
+                UpdatePageState();
+                MessageBox.Show(Window.GetWindow(this), "当前页有未提交的修改，请先提交后再翻页。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             PageIndex = targetPageIndex;
             RequestPage();
         }
@@ -281,6 +325,13 @@ namespace TXDB.Views
                 return;
             }
 
+            if (HasPendingChanges())
+            {
+                UpdatePageState();
+                MessageBox.Show(Window.GetWindow(this), "当前页有未提交的修改，请先提交后再更改每页行数。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             PageSize = targetPageSize;
             PageIndex = 1;
             UpdatePageState();
@@ -292,6 +343,12 @@ namespace TXDB.Views
         /// </summary>
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            if (HasPendingChanges())
+            {
+                MessageBox.Show(Window.GetWindow(this), "当前页有未提交的修改，请先提交或取消后再刷新。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             RequestPage();
         }
 
@@ -301,6 +358,301 @@ namespace TXDB.Views
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             ExportCurrentResult();
+        }
+
+        private void AddRowButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (resultTable == null)
+            {
+                return;
+            }
+
+            DataRow row = resultTable.NewRow();
+            resultTable.Rows.Add(row);
+            ResultGrid.SelectedItem = ResultGrid.Items[ResultGrid.Items.Count - 1];
+            ResultGrid.ScrollIntoView(ResultGrid.SelectedItem);
+            MessageText.Text = "已添加新行，填写字段后点击提交。";
+        }
+
+        private void DeleteRowButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResultGrid.CommitEdit(DataGridEditingUnit.Cell, true);
+            ResultGrid.CommitEdit(DataGridEditingUnit.Row, true);
+
+            List<DataRowView> selectedRows = ResultGrid.SelectedItems.Cast<object>()
+                .OfType<DataRowView>()
+                .ToList();
+            if (selectedRows.Count == 0 && ResultGrid.CurrentItem is DataRowView)
+            {
+                selectedRows.Add((DataRowView)ResultGrid.CurrentItem);
+            }
+
+            if (selectedRows.Count == 0)
+            {
+                MessageBox.Show(Window.GetWindow(this), "请先选择需要删除的行。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult confirmation = MessageBox.Show(
+                Window.GetWindow(this),
+                "确认删除选中的 " + selectedRows.Count + " 行，并提交当前页所有未提交更改吗？",
+                "确认删除",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if (confirmation != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            foreach (DataRowView row in selectedRows)
+            {
+                row.Delete();
+            }
+
+            MessageText.Text = "正在提交删除和当前页更改...";
+            SubmitChanges();
+        }
+
+        private void CommitChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubmitChanges();
+        }
+
+        private void SubmitChanges()
+        {
+            if (ResultGrid.CommitEdit(DataGridEditingUnit.Cell, true))
+            {
+                ResultGrid.CommitEdit(DataGridEditingUnit.Row, true);
+            }
+            ClearActiveCellEditTracking();
+
+            DataTable changes = resultTable == null ? null : resultTable.GetChanges();
+            if (changes == null || changes.Rows.Count == 0)
+            {
+                MessageText.Text = "没有待提交的修改。";
+                return;
+            }
+
+            EventHandler<TableCommitRequestedEventArgs> handler = CommitRequested;
+            if (handler == null)
+            {
+                MessageText.Text = "没有可用的数据提交处理器。";
+                return;
+            }
+
+            SetLoading(true);
+            MessageText.Text = "正在提交行变更...";
+            handler(this, new TableCommitRequestedEventArgs(Profile.Clone(), TableNode, changes));
+        }
+
+        private void CancelChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResultGrid.CancelEdit(DataGridEditingUnit.Cell);
+            ResultGrid.CancelEdit(DataGridEditingUnit.Row);
+            ClearActiveCellEditTracking();
+            if (resultTable != null)
+            {
+                resultTable.RejectChanges();
+            }
+
+            MessageText.Text = "已取消当前页未提交的更改。";
+            UpdateSelectionStatus();
+            UpdateEditCommandState();
+        }
+
+        private void ResultTable_RowChanged(object sender, DataRowChangeEventArgs e)
+        {
+            UpdateEditCommandState();
+        }
+
+        private void ResultTable_ColumnChanged(object sender, DataColumnChangeEventArgs e)
+        {
+            UpdateEditCommandState();
+        }
+
+        private void ResultTable_RowDeleted(object sender, DataRowChangeEventArgs e)
+        {
+            UpdateEditCommandState();
+        }
+
+        private void ResultGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount > 1)
+            {
+                return;
+            }
+
+            DataGridCell cell = FindAncestor<DataGridCell>(e.OriginalSource as DependencyObject);
+            if (cell == null || ResultGrid.IsReadOnly)
+            {
+                return;
+            }
+
+            if (cell.IsEditing)
+            {
+                return;
+            }
+
+            BeginCellEdit(cell, false);
+        }
+
+        private void ResultGrid_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataGridCell cell = FindAncestor<DataGridCell>(e.OriginalSource as DependencyObject);
+            if (cell == null || ResultGrid.IsReadOnly)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            BeginCellEdit(cell, true);
+        }
+
+        private void BeginCellEdit(DataGridCell cell, bool selectAll)
+        {
+            object rowItem = cell.DataContext;
+            DataGridColumn column = cell.Column;
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            {
+                if (!ResultGrid.IsEnabled || rowItem == null)
+                {
+                    return;
+                }
+
+                ResultGrid.CurrentCell = new DataGridCellInfo(rowItem, column);
+                ResultGrid.BeginEdit();
+                TextBox editor = FindDescendant<TextBox>(cell);
+                if (editor == null)
+                {
+                    return;
+                }
+
+                editor.Focus();
+                if (selectAll)
+                {
+                    editor.SelectAll();
+                }
+                else
+                {
+                    editor.CaretIndex = editor.Text == null ? 0 : editor.Text.Length;
+                }
+            }));
+        }
+
+        private void ResultGrid_PreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
+        {
+            TextBox editor = FindDescendant<TextBox>(e.EditingElement);
+            if (editor == null)
+            {
+                return;
+            }
+
+            ClearActiveCellEditTracking();
+            activeCellEditor = editor;
+            activeCellOriginalText = editor.Text;
+            activeCellEditor.TextChanged += ActiveCellEditor_TextChanged;
+        }
+
+        private void ResultGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            TextBox endingEditor = FindDescendant<TextBox>(e.EditingElement);
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+            {
+                if (ReferenceEquals(activeCellEditor, endingEditor))
+                {
+                    ClearActiveCellEditTracking();
+                }
+
+                UpdateEditCommandState();
+            }));
+        }
+
+        private void ActiveCellEditor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            hasUncommittedCellValue = activeCellEditor != null &&
+                !string.Equals(activeCellEditor.Text, activeCellOriginalText, StringComparison.Ordinal);
+            UpdateEditCommandState();
+        }
+
+        private void ClearActiveCellEditTracking()
+        {
+            if (activeCellEditor != null)
+            {
+                activeCellEditor.TextChanged -= ActiveCellEditor_TextChanged;
+            }
+
+            activeCellEditor = null;
+            activeCellOriginalText = null;
+            hasUncommittedCellValue = false;
+        }
+
+        private static T FindAncestor<T>(DependencyObject element) where T : DependencyObject
+        {
+            DependencyObject current = element;
+            while (current != null)
+            {
+                T match = current as T;
+                if (match != null)
+                {
+                    return match;
+                }
+
+                current = VisualTreeHelper.GetParent(current);
+            }
+
+            return null;
+        }
+
+        private static T FindDescendant<T>(DependencyObject element) where T : DependencyObject
+        {
+            if (element == null)
+            {
+                return null;
+            }
+
+            T elementMatch = element as T;
+            if (elementMatch != null)
+            {
+                return elementMatch;
+            }
+
+            int childCount = VisualTreeHelper.GetChildrenCount(element);
+            for (int index = 0; index < childCount; index++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(element, index);
+                T match = child as T;
+                if (match != null)
+                {
+                    return match;
+                }
+
+                match = FindDescendant<T>(child);
+                if (match != null)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        public void SetCommitFailure(string message)
+        {
+            SetLoading(false);
+            MessageText.Text = message ?? "提交失败。";
+        }
+
+        private bool HasPendingChanges()
+        {
+            return hasUncommittedCellValue || (resultTable != null && resultTable.GetChanges() != null);
+        }
+
+        private void UpdateEditCommandState()
+        {
+            bool hasPendingChanges = HasPendingChanges();
+            bool canEdit = !isLoading && TableNode != null && TableNode.Kind == DatabaseObjectKind.Table;
+            CommitChangesButton.IsEnabled = canEdit && hasPendingChanges;
+            CancelChangesButton.IsEnabled = canEdit && hasPendingChanges;
         }
 
         /// <summary>
@@ -340,6 +692,12 @@ namespace TXDB.Views
         /// </summary>
         private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
         {
+            if (HasPendingChanges())
+            {
+                MessageBox.Show(Window.GetWindow(this), "当前页有未提交的修改，请先提交或取消后再清空筛选。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             ResetFilterConditions();
             ApplyFilterAndReload();
         }
@@ -384,6 +742,12 @@ namespace TXDB.Views
                 return;
             }
 
+            if (HasPendingChanges())
+            {
+                MessageBox.Show(Window.GetWindow(this), "当前页有未提交的修改，请先提交后再重新筛选。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             PageIndex = 1;
             UpdateFilterSummary();
             UpdatePageState();
@@ -396,6 +760,12 @@ namespace TXDB.Views
         private void CloseFilterPanelAndClearFilter()
         {
             bool needReload = GetActiveFilters().Count > 0;
+            if (needReload && HasPendingChanges())
+            {
+                MessageBox.Show(Window.GetWindow(this), "当前页有未提交的修改，请先提交或取消后再关闭筛选。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             FilterPanel.Visibility = Visibility.Collapsed;
             FilterToggleButton.Content = "筛选";
             ResetFilterConditions();
@@ -424,6 +794,11 @@ namespace TXDB.Views
             PaginationControl.IsEnabled = !loading;
             FilterToggleButton.IsEnabled = !loading;
             FilterPanel.IsEnabled = !loading;
+            ResultGrid.IsEnabled = !loading;
+            AddRowButton.IsEnabled = !loading && TableNode != null && TableNode.Kind == DatabaseObjectKind.Table;
+            DeleteRowButton.IsEnabled = !loading && TableNode != null && TableNode.Kind == DatabaseObjectKind.Table;
+            UpdateEditCommandState();
+            RefreshButton.IsEnabled = !loading;
         }
 
         /// <summary>

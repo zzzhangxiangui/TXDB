@@ -48,5 +48,10 @@ namespace TXDB.Data
         /// 按快速筛选条件读取指定表或视图的分页预览数据。
         /// </summary>
         QueryExecutionResult PreviewTable(ConnectionProfile profile, DatabaseObjectNode tableNode, int pageIndex, int pageSize, IList<TableFilterCondition> filters);
+
+        /// <summary>
+        /// 保存表预览页中的新增、修改和删除行。
+        /// </summary>
+        int ApplyTableChanges(ConnectionProfile profile, DatabaseObjectNode tableNode, System.Data.DataTable changes);
     }
 }

@@ -1770,6 +1770,7 @@ namespace TXDB
 
             TablePreviewTabView view = new TablePreviewTabView();
             view.PageRequested += TablePreviewView_PageRequested;
+            view.CommitRequested += TablePreviewView_CommitRequested;
 
             TXTabItem tab = new TXTabItem();
             tab.Header = "数据 - " + tableNode.Name;
@@ -1811,6 +1812,32 @@ namespace TXDB
         }
 
         /// <summary>
+        /// 处理表预览页提交行变更的请求。
+        /// </summary>
+        private async void TablePreviewView_CommitRequested(object sender, TableCommitRequestedEventArgs e)
+        {
+            TablePreviewTabView view = sender as TablePreviewTabView;
+            if (view == null || e == null || e.Profile == null)
+            {
+                return;
+            }
+
+            try
+            {
+                IDatabaseProvider provider = DatabaseProviderRegistry.GetProvider(e.Profile.ProviderType);
+                int affectedRows = await Task.Run(() => provider.ApplyTableChanges(e.Profile, e.TableNode, e.Changes));
+                view.SetMessage("提交成功，影响 " + affectedRows + " 行，正在刷新...");
+                view.RequestPage();
+                StatusText.Text = "表数据修改已提交。";
+            }
+            catch (Exception exception)
+            {
+                view.SetCommitFailure("提交失败：" + exception.Message);
+                TXMessageBox.Show(this, "提交表数据修改失败：" + exception.Message, "TXDB", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
         /// 打开表结构标签页。
         /// </summary>
         private async Task OpenStructureTabAsync(DatabaseTreeNode node)
@@ -1839,7 +1866,7 @@ namespace TXDB
                 Density = TXDataGridDensity.Compact,
                 Margin = new Thickness(10)
             };
-            ResultGridHelper.Configure(grid);
+            ResultGridHelper.ConfigureQueryResult(grid);
 
             TextBlock title = new TextBlock
             {
@@ -2024,6 +2051,7 @@ namespace TXDB
             if (previewView != null)
             {
                 previewView.PageRequested -= TablePreviewView_PageRequested;
+                previewView.CommitRequested -= TablePreviewView_CommitRequested;
             }
         }
 

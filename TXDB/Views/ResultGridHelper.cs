@@ -8,13 +8,13 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using ICSharpCode.AvalonEdit;
+using System.Windows.Threading;
 using TX.WpfUI.Controls;
 
 namespace TXDB.Views
 {
     /// <summary>
-    /// 结果表格显示辅助类，统一处理复制、列宽、长文本省略和完整内容查看。
+    /// 结果表格显示辅助类，统一处理复制、列宽、长文本显示和单元格选择。
     /// </summary>
     public static class ResultGridHelper
     {
@@ -23,6 +23,9 @@ namespace TXDB.Views
 
         private static readonly DataTemplate ResultColumnHeaderTemplate = CreateResultColumnHeaderTemplate();
         private static readonly Style ResultTextElementStyle = CreateResultTextElementStyle();
+        private static readonly Style QueryResultTextElementStyle = CreateQueryResultTextElementStyle();
+        private static readonly DependencyProperty UseQueryCellFocusVisualsProperty =
+            DependencyProperty.RegisterAttached("UseQueryCellFocusVisuals", typeof(bool), typeof(ResultGridHelper), new PropertyMetadata(false));
 
         /// <summary>
         /// 配置查询结果或表预览结果表格的通用交互。
@@ -49,13 +52,228 @@ namespace TXDB.Views
             ScrollViewer.SetIsDeferredScrollingEnabled(grid, false);
             grid.AutoGeneratingColumn -= ResultGrid_AutoGeneratingColumn;
             grid.AutoGeneratingColumn += ResultGrid_AutoGeneratingColumn;
+            grid.AutoGeneratingColumn -= QueryResultGrid_AutoGeneratingColumn;
             grid.Sorting -= ResultGrid_Sorting;
             grid.Sorting += ResultGrid_Sorting;
             grid.PreviewMouseRightButtonDown -= ResultGrid_PreviewMouseRightButtonDown;
             grid.PreviewMouseRightButtonDown += ResultGrid_PreviewMouseRightButtonDown;
-            grid.MouseDoubleClick -= ResultGrid_MouseDoubleClick;
-            grid.MouseDoubleClick += ResultGrid_MouseDoubleClick;
+            grid.PreviewMouseLeftButtonDown -= QueryResultGrid_PreviewMouseLeftButtonDown;
+            grid.PreviewMouseDoubleClick -= QueryResultGrid_PreviewMouseDoubleClick;
             grid.ContextMenu = CreateContextMenu();
+        }
+
+        /// <summary>
+        /// 配置查询结果网格，使只读单元格仍可定位和选择其中的文本。
+        /// </summary>
+        public static void ConfigureQueryResult(TXDataGrid grid, bool useQueryCellFocusVisuals = false)
+        {
+            if (grid == null)
+            {
+                return;
+            }
+
+            Configure(grid);
+            grid.SetValue(UseQueryCellFocusVisualsProperty, useQueryCellFocusVisuals);
+            if (useQueryCellFocusVisuals)
+            {
+                // The grid enters its native edit visual only to provide a caret; its editor stays read-only.
+                grid.IsReadOnly = false;
+            }
+            grid.AutoGeneratingColumn -= ResultGrid_AutoGeneratingColumn;
+            grid.AutoGeneratingColumn -= QueryResultGrid_AutoGeneratingColumn;
+            grid.AutoGeneratingColumn += QueryResultGrid_AutoGeneratingColumn;
+            grid.PreviewMouseLeftButtonDown -= QueryResultGrid_PreviewMouseLeftButtonDown;
+            grid.PreviewMouseLeftButtonDown += QueryResultGrid_PreviewMouseLeftButtonDown;
+            grid.PreviewMouseDoubleClick -= QueryResultGrid_PreviewMouseDoubleClick;
+            grid.PreviewMouseDoubleClick += QueryResultGrid_PreviewMouseDoubleClick;
+        }
+
+        private static void QueryResultGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            TXDataGrid grid = sender as TXDataGrid;
+            if (grid == null)
+            {
+                return;
+            }
+
+            bool useQueryCellFocusVisuals = (bool)grid.GetValue(UseQueryCellFocusVisualsProperty);
+            if (useQueryCellFocusVisuals)
+            {
+                TXDataGridTextColumn textColumn = new TXDataGridTextColumn();
+                textColumn.Header = e.PropertyName;
+                textColumn.HeaderTemplate = ResultColumnHeaderTemplate;
+                textColumn.SortMemberPath = e.PropertyName;
+                textColumn.CanUserSort = false;
+                textColumn.MinWidth = 70;
+                textColumn.MaxWidth = MaxResultColumnWidth;
+                textColumn.Width = new DataGridLength(DefaultResultColumnWidth);
+                textColumn.ElementStyle = QueryResultTextElementStyle;
+                textColumn.EditingElementStyle = CreateReadOnlyQueryEditorStyle(grid);
+                textColumn.Binding = CreateCellBinding(e.PropertyName);
+                textColumn.ClipboardContentBinding = CreateCellBinding(e.PropertyName);
+                e.Column = textColumn;
+                return;
+            }
+
+            DataGridTemplateColumn column = new DataGridTemplateColumn();
+            column.Header = e.PropertyName;
+            column.HeaderTemplate = ResultColumnHeaderTemplate;
+            column.SortMemberPath = e.PropertyName;
+            column.CanUserSort = false;
+            column.MinWidth = 70;
+            column.MaxWidth = MaxResultColumnWidth;
+            column.Width = new DataGridLength(DefaultResultColumnWidth);
+            column.IsReadOnly = true;
+            column.ClipboardContentBinding = CreateCellBinding(e.PropertyName);
+            column.CellTemplate = CreateReadOnlySelectableCellTemplate(e.PropertyName);
+            e.Column = column;
+        }
+
+        private static DataTemplate CreateReadOnlySelectableCellTemplate(string columnName)
+        {
+            FrameworkElementFactory textBox = new FrameworkElementFactory(typeof(TextBox));
+            textBox.SetBinding(TextBox.TextProperty, CreateCellBinding(columnName));
+            textBox.SetValue(TextBox.IsReadOnlyProperty, true);
+            textBox.SetValue(TextBox.IsReadOnlyCaretVisibleProperty, true);
+            textBox.SetValue(TextBox.BorderThicknessProperty, new Thickness(0));
+            textBox.SetValue(TextBox.BackgroundProperty, Brushes.Transparent);
+            textBox.SetValue(TextBox.PaddingProperty, new Thickness(6, 0, 6, 0));
+            textBox.SetValue(TextBox.TextWrappingProperty, TextWrapping.NoWrap);
+            textBox.SetValue(TextBox.VerticalContentAlignmentProperty, VerticalAlignment.Center);
+            textBox.SetValue(TextBox.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
+            textBox.SetValue(TextBox.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
+
+            return new DataTemplate { VisualTree = textBox };
+        }
+
+        private static Style CreateQueryResultTextElementStyle()
+        {
+            Style style = new Style(typeof(TextBlock), ResultTextElementStyle);
+            DataTrigger selectedTrigger = new DataTrigger
+            {
+                Binding = new Binding("IsSelected")
+                {
+                    RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridCell), 1)
+                },
+                Value = true
+            };
+            selectedTrigger.Setters.Add(new Setter(TextBlock.ForegroundProperty, SystemColors.HighlightTextBrush));
+            style.Triggers.Add(selectedTrigger);
+            return style;
+        }
+
+        private static Style CreateReadOnlyQueryEditorStyle(TXDataGrid grid)
+        {
+            Style baseStyle = grid.TryFindResource(typeof(TextBox)) as Style;
+            Style style = baseStyle == null
+                ? new Style(typeof(TextBox))
+                : new Style(typeof(TextBox), baseStyle);
+            style.Setters.Add(new Setter(TextBox.IsReadOnlyProperty, true));
+            style.Setters.Add(new Setter(TextBox.IsReadOnlyCaretVisibleProperty, true));
+            style.Setters.Add(new Setter(TextBox.BackgroundProperty, Brushes.White));
+            style.Setters.Add(new Setter(TextBox.BorderThicknessProperty, new Thickness(0)));
+            style.Setters.Add(new Setter(TextBox.PaddingProperty, new Thickness(6, 0, 6, 0)));
+            style.Setters.Add(new Setter(TextBox.VerticalContentAlignmentProperty, VerticalAlignment.Center));
+            return style;
+        }
+
+        private static void QueryResultGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TXDataGrid grid = sender as TXDataGrid;
+            if (grid != null && (bool)grid.GetValue(UseQueryCellFocusVisualsProperty))
+            {
+                DataGridCell cell = FindParent<DataGridCell>(e.OriginalSource as DependencyObject);
+                if (cell == null || e.ClickCount > 1 || cell.IsEditing || Keyboard.Modifiers != ModifierKeys.None)
+                {
+                    return;
+                }
+
+                BeginQueryCellEdit(grid, cell, false);
+                return;
+            }
+
+            TextBox textBox = FindParent<TextBox>(e.OriginalSource as DependencyObject);
+            if (textBox == null || e.ClickCount > 1 || textBox.IsKeyboardFocusWithin)
+            {
+                return;
+            }
+
+            textBox.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            {
+                if (!textBox.IsVisible)
+                {
+                    return;
+                }
+
+                textBox.Focus();
+                textBox.CaretIndex = textBox.Text == null ? 0 : textBox.Text.Length;
+            }));
+        }
+
+        private static void QueryResultGrid_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            TXDataGrid grid = sender as TXDataGrid;
+            if (grid != null && (bool)grid.GetValue(UseQueryCellFocusVisualsProperty))
+            {
+                DataGridCell cell = FindParent<DataGridCell>(e.OriginalSource as DependencyObject);
+                if (cell == null)
+                {
+                    return;
+                }
+
+                e.Handled = true;
+                BeginQueryCellEdit(grid, cell, true);
+                return;
+            }
+
+            TextBox textBox = FindParent<TextBox>(e.OriginalSource as DependencyObject);
+            if (textBox == null)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            textBox.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            {
+                if (!textBox.IsVisible)
+                {
+                    return;
+                }
+
+                textBox.Focus();
+                textBox.SelectAll();
+            }));
+        }
+
+        private static void BeginQueryCellEdit(TXDataGrid grid, DataGridCell cell, bool selectAll)
+        {
+            object rowItem = cell.DataContext;
+            DataGridColumn column = cell.Column;
+            grid.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            {
+                if (!grid.IsEnabled || rowItem == null)
+                {
+                    return;
+                }
+
+                grid.CurrentCell = new DataGridCellInfo(rowItem, column);
+                grid.BeginEdit();
+                TextBox editor = FindDescendant<TextBox>(cell);
+                if (editor == null)
+                {
+                    return;
+                }
+
+                editor.Focus();
+                if (selectAll)
+                {
+                    editor.SelectAll();
+                }
+                else
+                {
+                    editor.CaretIndex = editor.Text == null ? 0 : editor.Text.Length;
+                }
+            }));
         }
 
         /// <summary>
@@ -63,6 +281,7 @@ namespace TXDB.Views
         /// </summary>
         private static void ResultGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
+            TXDataGrid grid = sender as TXDataGrid;
             string columnName = e.PropertyName;
             TXDataGridTextColumn column = new TXDataGridTextColumn();
             column.Header = columnName;
@@ -73,7 +292,7 @@ namespace TXDB.Views
             column.MaxWidth = MaxResultColumnWidth;
             column.Width = new DataGridLength(DefaultResultColumnWidth);
             column.ElementStyle = ResultTextElementStyle;
-            column.Binding = CreateCellBinding(columnName);
+            column.Binding = CreateCellBinding(columnName, !grid.IsReadOnly);
             column.ClipboardContentBinding = CreateCellBinding(columnName);
             e.Column = column;
         }
@@ -109,10 +328,15 @@ namespace TXDB.Views
         /// <summary>
         /// 创建从 DataRowView 按列名读取单元格值的轻量绑定。
         /// </summary>
-        private static Binding CreateCellBinding(string columnName)
+        private static Binding CreateCellBinding(string columnName, bool allowEdit = false)
         {
             Binding binding = new Binding("[" + columnName + "]");
-            binding.Mode = BindingMode.OneWay;
+            binding.Mode = allowEdit ? BindingMode.TwoWay : BindingMode.OneWay;
+            if (allowEdit)
+            {
+                binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            }
+
             return binding;
         }
 
@@ -184,11 +408,6 @@ namespace TXDB.Views
             copyItem.Click += CopyCellMenuItem_Click;
             menu.Items.Add(copyItem);
 
-            MenuItem viewItem = new MenuItem();
-            viewItem.Header = "查看完整内容";
-            viewItem.Click += ViewCellMenuItem_Click;
-            menu.Items.Add(viewItem);
-
             return menu;
         }
 
@@ -216,7 +435,7 @@ namespace TXDB.Views
         }
 
         /// <summary>
-        /// 右键单元格时同步选中当前单元格，便于复制或查看完整内容。
+        /// 右键单元格时同步选中当前单元格，便于复制文本。
         /// </summary>
         private static void ResultGrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -297,29 +516,6 @@ namespace TXDB.Views
         }
 
         /// <summary>
-        /// 双击单元格时按需打开完整内容窗口。
-        /// </summary>
-        private static void ResultGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            TXDataGrid grid = sender as TXDataGrid;
-            DataGridCell cell = FindParent<DataGridCell>(e.OriginalSource as DependencyObject);
-            if (grid == null || cell == null)
-            {
-                return;
-            }
-
-            DataGridRow row = FindParent<DataGridRow>(cell);
-            if (row == null)
-            {
-                return;
-            }
-
-            grid.CurrentCell = new DataGridCellInfo(row.Item, cell.Column);
-            string text = GetCurrentCellText(grid);
-            ShowCellValueWindow(Window.GetWindow(grid), text);
-        }
-
-        /// <summary>
         /// 复制当前单元格文本。
         /// </summary>
         private static void CopyCellMenuItem_Click(object sender, RoutedEventArgs e)
@@ -331,20 +527,6 @@ namespace TXDB.Views
             }
 
             Clipboard.SetText(GetCurrentCellText(grid));
-        }
-
-        /// <summary>
-        /// 查看当前单元格完整内容。
-        /// </summary>
-        private static void ViewCellMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            TXDataGrid grid = GetGridFromMenuItem(sender as MenuItem);
-            if (grid == null || !grid.CurrentCell.IsValid)
-            {
-                return;
-            }
-
-            ShowCellValueWindow(Window.GetWindow(grid), GetCurrentCellText(grid));
         }
 
         /// <summary>
@@ -531,78 +713,31 @@ namespace TXDB.Views
             return Convert.ToString(value, CultureInfo.CurrentCulture) ?? string.Empty;
         }
 
-        /// <summary>
-        /// 显示完整单元格内容窗口。
-        /// </summary>
-        private static void ShowCellValueWindow(Window owner, string text)
+        private static T FindDescendant<T>(DependencyObject parent) where T : DependencyObject
         {
-            Window window = new Window();
-            window.Title = "单元格内容";
-            window.Width = 720;
-            window.Height = 520;
-            window.MinWidth = 420;
-            window.MinHeight = 300;
-            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            window.Owner = owner;
-            window.Background = Brushes.White;
-
-            Grid root = new Grid();
-            root.Margin = new Thickness(14);
-            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(44) });
-
-            TextEditor editor = new TextEditor();
-            editor.Text = text ?? string.Empty;
-            editor.IsReadOnly = true;
-            editor.WordWrap = true;
-            editor.ShowLineNumbers = false;
-            editor.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-            editor.FontFamily = new FontFamily("Consolas");
-            editor.FontSize = 13;
-            editor.Padding = new Thickness(8);
-            editor.SetResourceReference(Control.BackgroundProperty, "TX.Brush.Surface");
-            editor.SetResourceReference(Control.ForegroundProperty, "TX.Brush.TextPrimary");
-            editor.Loaded += delegate
+            if (parent == null)
             {
-                editor.ScrollToHome();
-            };
-            Grid.SetRow(editor, 0);
-            root.Children.Add(editor);
+                return null;
+            }
 
-            StackPanel buttons = new StackPanel();
-            buttons.Orientation = Orientation.Horizontal;
-            buttons.HorizontalAlignment = HorizontalAlignment.Right;
-            buttons.VerticalAlignment = VerticalAlignment.Center;
-
-            TXButton copyButton = new TXButton();
-            copyButton.Content = "复制";
-            copyButton.ButtonType = TXButtonType.Primary;
-            copyButton.ButtonSize = TXButtonSize.Medium;
-            copyButton.Width = 82;
-            copyButton.Margin = new Thickness(0, 0, 8, 0);
-            copyButton.Click += delegate
+            int childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childCount; i++)
             {
-                Clipboard.SetText(editor.Text ?? string.Empty);
-            };
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+                T typedChild = child as T;
+                if (typedChild != null)
+                {
+                    return typedChild;
+                }
 
-            TXButton closeButton = new TXButton();
-            closeButton.Content = "关闭";
-            closeButton.ButtonType = TXButtonType.Default;
-            closeButton.ButtonSize = TXButtonSize.Medium;
-            closeButton.Width = 82;
-            closeButton.Click += delegate
-            {
-                window.Close();
-            };
+                T descendant = FindDescendant<T>(child);
+                if (descendant != null)
+                {
+                    return descendant;
+                }
+            }
 
-            buttons.Children.Add(copyButton);
-            buttons.Children.Add(closeButton);
-            Grid.SetRow(buttons, 1);
-            root.Children.Add(buttons);
-
-            window.Content = root;
-            window.ShowDialog();
+            return null;
         }
 
         /// <summary>
