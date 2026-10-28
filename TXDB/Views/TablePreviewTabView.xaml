@@ -40,6 +40,27 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- 控件库默认行模板只包含单元格；在预览页补上原生行头，保留单元格呈现器和分割线。 -->
+        <ControlTemplate x:Key="RecordRowTemplate" TargetType="{x:Type DataGridRow}">
+            <SelectiveScrollingGrid Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <DataGridCellsPresenter Grid.Column="1" ItemsPanel="{TemplateBinding ItemsPanel}"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                <DataGridDetailsPresenter Grid.Column="1" Grid.Row="1"
+                                          Visibility="{TemplateBinding DetailsVisibility}"
+                                          SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical" />
+                <DataGridRowHeader Grid.RowSpan="2" SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical" />
+                <Rectangle Grid.ColumnSpan="2" Height="1" VerticalAlignment="Bottom"
+                           Fill="{DynamicResource TX.Brush.Border}" IsHitTestVisible="False" />
+            </SelectiveScrollingGrid>
+        </ControlTemplate>
         <Style x:Key="RecordToolbarIconStyle" TargetType="{x:Type tx:TXIcon}">
             <Setter Property="Foreground" Value="#646464" />
             <Style.Triggers>
@@ -48,6 +69,41 @@
                     <Setter Property="Foreground" Value="#c0c0c0" />
                 </DataTrigger>
             </Style.Triggers>
+        </Style>
+        <Style x:Key="RecordRowHeaderStyle" TargetType="{x:Type DataGridRowHeader}">
+            <Setter Property="Background" Value="#f1f1f1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TX.Brush.Border}" />
+            <Setter Property="BorderThickness" Value="0,0,1,1" />
+            <Setter Property="ToolTip" Value="点击选择整行；Ctrl 多选，Shift 连选" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridRowHeader}">
+                        <Border x:Name="HeaderBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid>
+                                <Ellipse x:Name="SelectedMark" Width="4" Height="4" Fill="#646464" Visibility="Collapsed" />
+                                <Path x:Name="CurrentMark" Data="M 0,0 L 4,4 L 0,8 Z" Fill="#646464"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="#e5f3ff" />
+                                <Setter TargetName="SelectedMark" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
+                                <Setter TargetName="SelectedMark" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="CurrentMark" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="#e5f3ff" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
 
@@ -289,7 +345,9 @@
                        CurrentCellChanged="ResultGrid_CurrentCellChanged"
                        SelectedCellsChanged="ResultGrid_SelectedCellsChanged"
                        GridLinesVisibility="Horizontal"
-                       HeadersVisibility="Column" />
+                       HeadersVisibility="All"
+                       RowHeaderWidth="24"
+                       RowHeaderStyle="{StaticResource RecordRowHeaderStyle}" />
 
         <tx:TXPagination x:Name="PaginationControl"
                          Grid.Row="3"

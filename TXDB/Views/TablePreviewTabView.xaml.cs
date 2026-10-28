@@ -104,6 +104,9 @@ namespace TXDB.Views
             filterLogicOptions = new List<string> { "AND", "OR" };
             filterOperatorOptions = BuildFilterOperatorOptions();
             InitializeComponent();
+            Style rowStyle = new Style(typeof(DataGridRow), ResultGrid.RowStyle);
+            rowStyle.Setters.Add(new Setter(Control.TemplateProperty, (ControlTemplate)Resources["RecordRowTemplate"]));
+            ResultGrid.RowStyle = rowStyle;
             pageSizeOptions = new List<int> { 100, 200, 500, 1000, 10000 };
             PageIndex = 1;
             PageSize = 100;
@@ -218,6 +221,7 @@ namespace TXDB.Views
         private void ResultGrid_CurrentCellChanged(object sender, EventArgs e)
         {
             UpdateSelectionStatus();
+            UpdateEditCommandState();
         }
 
         /// <summary>
@@ -226,6 +230,7 @@ namespace TXDB.Views
         private void ResultGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             UpdateSelectionStatus();
+            UpdateEditCommandState();
         }
 
         /// <summary>
@@ -365,7 +370,7 @@ namespace TXDB.Views
 
         private void AddRowButton_Click(object sender, RoutedEventArgs e)
         {
-            if (resultTable == null)
+            if (resultTable == null || resultTable.Columns.Count == 0 || !TryCommitGridEdit())
             {
                 return;
             }
@@ -379,17 +384,12 @@ namespace TXDB.Views
 
         private void DeleteRowButton_Click(object sender, RoutedEventArgs e)
         {
-            ResultGrid.CommitEdit(DataGridEditingUnit.Cell, true);
-            ResultGrid.CommitEdit(DataGridEditingUnit.Row, true);
-
-            List<DataRowView> selectedRows = ResultGrid.SelectedItems.Cast<object>()
-                .OfType<DataRowView>()
-                .ToList();
-            if (selectedRows.Count == 0 && ResultGrid.CurrentItem is DataRowView)
+            if (!TryCommitGridEdit())
             {
-                selectedRows.Add((DataRowView)ResultGrid.CurrentItem);
+                return;
             }
 
+            List<DataRowView> selectedRows = GetSelectedRows();
             if (selectedRows.Count == 0)
             {
                 MessageBox.Show(Window.GetWindow(this), "请先选择需要删除的行。", "TXDB", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -407,6 +407,11 @@ namespace TXDB.Views
                 return;
             }
 
+            DeleteRowsAndSubmit(selectedRows);
+        }
+
+        private void DeleteRowsAndSubmit(IList<DataRowView> selectedRows)
+        {
             foreach (DataRowView row in selectedRows)
             {
                 row.Delete();
@@ -416,6 +421,31 @@ namespace TXDB.Views
             SubmitChanges();
         }
 
+        // CellOrRowHeader 模式下，框选单元格的行只出现在 SelectedCells 中。
+        private List<DataRowView> GetSelectedRows()
+        {
+            return ResultGrid.SelectedItems.Cast<object>()
+                .Concat(ResultGrid.SelectedCells.Select(cell => cell.Item))
+                .OfType<DataRowView>()
+                .Where(row => row.Row.RowState != DataRowState.Deleted && row.Row.RowState != DataRowState.Detached)
+                .GroupBy(row => row.Row)
+                .Select(group => group.First())
+                .ToList();
+        }
+
+        private bool TryCommitGridEdit()
+        {
+            if (!ResultGrid.CommitEdit(DataGridEditingUnit.Cell, true) ||
+                !ResultGrid.CommitEdit(DataGridEditingUnit.Row, true))
+            {
+                MessageText.Text = "请先修正当前单元格中的无效值。";
+                return false;
+            }
+
+            ClearActiveCellEditTracking();
+            return true;
+        }
+
         private void CommitChangesButton_Click(object sender, RoutedEventArgs e)
         {
             SubmitChanges();
@@ -423,11 +453,10 @@ namespace TXDB.Views
 
         private void SubmitChanges()
         {
-            if (ResultGrid.CommitEdit(DataGridEditingUnit.Cell, true))
+            if (!TryCommitGridEdit())
             {
-                ResultGrid.CommitEdit(DataGridEditingUnit.Row, true);
+                return;
             }
-            ClearActiveCellEditTracking();
 
             DataTable changes = resultTable == null ? null : resultTable.GetChanges();
             if (changes == null || changes.Rows.Count == 0)
@@ -480,7 +509,7 @@ namespace TXDB.Views
 
         private void ResultGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount > 1)
+            if (e.ClickCount > 1 || Keyboard.Modifiers != ModifierKeys.None)
             {
                 return;
             }
@@ -501,6 +530,11 @@ namespace TXDB.Views
 
         private void ResultGrid_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (Keyboard.Modifiers != ModifierKeys.None)
+            {
+                return;
+            }
+
             DataGridCell cell = FindAncestor<DataGridCell>(e.OriginalSource as DependencyObject);
             if (cell == null || ResultGrid.IsReadOnly)
             {
@@ -645,6 +679,9 @@ namespace TXDB.Views
             MessageText.Text = message ?? "提交失败。";
         }
 
+        public bool HasUncommittedChanges { get { return HasPendingChanges(); } }
+        public bool IsDataOperationInProgress { get { return isLoading; } }
+
         private bool HasPendingChanges()
         {
             return hasUncommittedCellValue || (resultTable != null && resultTable.GetChanges() != null);
@@ -654,6 +691,9 @@ namespace TXDB.Views
         {
             bool hasPendingChanges = HasPendingChanges();
             bool canEdit = !isLoading && TableNode != null && TableNode.Kind == DatabaseObjectKind.Table;
+            AddRowButton.IsEnabled = canEdit && resultTable != null && resultTable.Columns.Count > 0;
+            DeleteRowButton.IsEnabled = canEdit && (ResultGrid.SelectedItems.OfType<DataRowView>().Any() ||
+                ResultGrid.SelectedCells.Any(cell => cell.Item is DataRowView));
             CommitChangesButton.IsEnabled = canEdit && hasPendingChanges;
             CancelChangesButton.IsEnabled = canEdit && hasPendingChanges;
         }

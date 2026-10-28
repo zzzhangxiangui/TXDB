@@ -127,6 +127,11 @@ namespace TXDB
                 return;
             }
 
+            foreach (TableStructureTabView structure in MainTabs.Items.OfType<TXTabItem>().Select(tab => tab.Content).OfType<TableStructureTabView>())
+            {
+                if (!structure.ConfirmClose()) { e.Cancel = true; return; }
+            }
+
             MessageBoxResult result = TXMessageBox.Show(this, "确定退出 TXDB 吗？正在执行的查询会请求停止。", "退出确认", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes)
             {
@@ -660,6 +665,8 @@ namespace TXDB
             SetMenuItemVisible(OpenSavedQueryMenuItem, isSavedQuery);
             SetMenuItemVisible(QueryTopRowsMenuItem, isTable);
             SetMenuItemVisible(ViewStructureMenuItem, isTable);
+            SetMenuItemVisible(NewTableMenuItem, isConnection || isDatabase || isSchema || isTable || (node != null && node.Kind == DatabaseObjectKind.TablesFolder));
+            SetMenuItemVisible(DropTableMenuItem, node != null && node.Kind == DatabaseObjectKind.Table);
             SetMenuItemVisible(SavedQuerySeparator, isQueriesFolder || isSavedQuery);
             SetMenuItemVisible(ImportQueriesMenuItem, isQueriesFolder);
             SetMenuItemVisible(ExportQueriesMenuItem, isQueriesFolder || isSavedQuery);
@@ -961,6 +968,112 @@ namespace TXDB
         private async void ViewStructureMenu_Click(object sender, RoutedEventArgs e)
         {
             await OpenStructureTabAsync(GetSelectedTreeNode());
+        }
+
+        private async void NewTableMenu_Click(object sender, RoutedEventArgs e)
+        {
+            DatabaseTreeNode selected = GetSelectedTreeNode();
+            ConnectionProfile profile = GetProfileForNode(selected);
+            if (profile == null) return;
+            DatabaseTreeNode connection = GetConnectionNode(selected);
+            DatabaseTreeNode database = GetDatabaseNode(selected);
+            if (database == null && connection != null)
+            {
+                var databases = connection.Children.Where(n => n.Kind == DatabaseObjectKind.Database).ToList();
+                if (databases.Count == 1) database = databases[0];
+            }
+            string databaseName = database != null ? database.Name : profile.DatabaseName;
+            string schema = GetSchemaNode(selected) == null ? string.Empty : GetSchemaNode(selected).Name;
+            if (profile.ProviderType == DatabaseProviderType.SqlServer && schema.Length == 0) schema = "dbo";
+            if (profile.ProviderType == DatabaseProviderType.Oracle && schema.Length == 0) schema = (profile.UserName ?? string.Empty).ToUpperInvariant();
+            if (profile.ProviderType == DatabaseProviderType.MySQL) schema = string.Empty;
+            if (profile.ProviderType == DatabaseProviderType.SQLite) { schema = "main"; if (string.IsNullOrEmpty(databaseName)) databaseName = "main"; }
+            if (profile.ProviderType == DatabaseProviderType.Access && string.IsNullOrEmpty(databaseName)) databaseName = Path.GetFileName(profile.FilePath);
+            DatabaseObjectNode node = new DatabaseObjectNode { Name = string.Empty, DatabaseName = databaseName, SchemaName = schema, Kind = DatabaseObjectKind.Table };
+            await CreateStructureViewAsync(profile, node, true);
+        }
+
+        private async void DropTableMenu_Click(object sender, RoutedEventArgs e)
+        {
+            DatabaseTreeNode selected = GetSelectedTreeNode();
+            if (selected == null || selected.Kind != DatabaseObjectKind.Table) return;
+            ConnectionProfile profile = GetProfileForNode(selected);
+            DatabaseObjectNode node = selected.Metadata;
+            if (profile == null || node == null || !CanChangeTableStructure(profile, node)) return;
+            TableStructureTabView structure = FindTabByKey(BuildStructureTabKey(profile, node))?.Content as TableStructureTabView;
+            if (structure != null && !structure.ConfirmClose()) return;
+            string location = (profile.Name ?? string.Empty) + " / " + node.DatabaseName + " / " + (string.IsNullOrEmpty(node.SchemaName) ? node.Name : node.SchemaName + "." + node.Name);
+            if (TXMessageBox.Show(this, "确定删除表吗？\n\n" + location + "\n\n表结构和全部数据都会被删除，此操作不能通过取消按钮恢复。", "删除表", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+            if (!CanChangeTableStructure(profile, node)) return;
+            CloseObjectTab(BuildStructureTabKey(profile, node));
+            CloseObjectTab(BuildTablePreviewTabKey(profile, node));
+            DropTableMenuItem.IsEnabled = false;
+            try
+            {
+                TableSchemaEditor editor = new TableSchemaEditor(DatabaseProviderRegistry.GetProvider(profile.ProviderType));
+                await Task.Run(() => editor.DropTable(profile, node));
+                CloseObjectTab(BuildStructureTabKey(profile, node));
+                CloseObjectTab(BuildTablePreviewTabKey(profile, node));
+                await RefreshSchemaTreeAsync(profile, node);
+                StatusText.Text = "已删除表：" + node.Name;
+            }
+            catch (Exception ex) { TXMessageBox.Show(this, ex.Message, "删除表失败", MessageBoxButton.OK, MessageBoxImage.Error); }
+            finally { DropTableMenuItem.IsEnabled = true; }
+        }
+
+        private bool CanChangeTableStructure(ConnectionProfile profile, DatabaseObjectNode node)
+        {
+            TablePreviewTabView preview = FindTabByKey(BuildTablePreviewTabKey(profile, node))?.Content as TablePreviewTabView;
+            if (preview != null && (preview.HasUncommittedChanges || preview.IsDataOperationInProgress))
+            {
+                TXMessageBox.Show(this, "表数据页有未提交的更改，或正在执行数据操作。请先完成、提交或取消，再修改表结构。", "表结构", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            TableStructureTabView structure = FindTabByKey(BuildStructureTabKey(profile, node))?.Content as TableStructureTabView;
+            if (structure != null && structure.IsBusy)
+            {
+                TXMessageBox.Show(this, "正在处理此表的结构，请完成后再操作。", "表结构", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            return true;
+        }
+
+        private void CloseObjectTab(string key)
+        {
+            TXTabItem tab = FindTabByKey(key);
+            if (tab == null) return;
+            CleanupTab(tab);
+            MainTabs.Items.Remove(tab);
+        }
+
+        private async Task RefreshSchemaTreeAsync(ConnectionProfile profile, DatabaseObjectNode node)
+        {
+            DatabaseTreeNode connection = ConnectionNodes.FirstOrDefault(n => n.Profile != null && n.Profile.Id == profile.Id);
+            if (connection == null) return;
+            DatabaseTreeNode database = connection.Children.FirstOrDefault(n => n.Kind == DatabaseObjectKind.Database && SameName(n.Name, node.DatabaseName));
+            if (database == null)
+            {
+                await LoadConnectionMetadataAsync(connection);
+                database = connection.Children.FirstOrDefault(n => n.Kind == DatabaseObjectKind.Database && SameName(n.Name, node.DatabaseName));
+            }
+            if (database != null) await LoadDatabaseMetadataAsync(database);
+        }
+
+        private async void StructureView_SchemaSaved(object sender, EventArgs e)
+        {
+            TableStructureTabView view = sender as TableStructureTabView;
+            if (view == null) return;
+            TXTabItem tab = MainTabs.Items.OfType<TXTabItem>().FirstOrDefault(t => t.Content == view);
+            if (tab != null) { tab.Tag = BuildStructureTabKey(view.Profile, view.TableNode); tab.Header = "结构 - " + view.TableNode.Name; }
+            CloseObjectTab(BuildTablePreviewTabKey(view.Profile, view.TableNode));
+            await RefreshSchemaTreeAsync(view.Profile, view.TableNode);
+            StatusText.Text = "表结构已提交：" + view.TableNode.Name;
+        }
+
+        private void StructureView_SchemaSaving(object sender, EventArgs e)
+        {
+            TableStructureTabView view = sender as TableStructureTabView;
+            if (view != null && !view.IsNew) CloseObjectTab(BuildTablePreviewTabKey(view.Profile, view.TableNode));
         }
 
         /// <summary>
@@ -1859,50 +1972,25 @@ namespace TXDB
                 return;
             }
 
-            TXDataGrid grid = new TXDataGrid
-            {
-                AutoGenerateColumns = true,
-                IsReadOnly = true,
-                Density = TXDataGridDensity.Compact,
-                Margin = new Thickness(10)
-            };
-            ResultGridHelper.ConfigureQueryResult(grid);
+            await CreateStructureViewAsync(profile, node.Metadata, false);
+        }
 
-            TextBlock title = new TextBlock
-            {
-                Text = node.Name + " 结构",
-                FontSize = 18,
-                FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(10, 12, 10, 4)
-            };
-            title.SetResourceReference(TextBlock.ForegroundProperty, "TX.Brush.TextPrimary");
-
-            DockPanel panel = new DockPanel();
-            panel.SetResourceReference(DockPanel.BackgroundProperty, "TX.Brush.Surface");
-            DockPanel.SetDock(title, Dock.Top);
-            panel.Children.Add(title);
-            panel.Children.Add(grid);
-
+        private async Task CreateStructureViewAsync(ConnectionProfile profile, DatabaseObjectNode node, bool isNew)
+        {
+            TableStructureTabView view = new TableStructureTabView();
             TXTabItem tab = new TXTabItem();
-            tab.Header = "结构 - " + node.Name;
+            tab.Header = isNew ? "新建表" : "结构 - " + node.Name;
             tab.IsClosable = true;
-            tab.Content = panel;
-            tab.Tag = tabKey;
+            tab.Content = view;
+            tab.Tag = isNew ? "new-table:" + Guid.NewGuid().ToString("N") : BuildStructureTabKey(profile, node);
             tab.Close += Tab_Close;
+            view.SchemaSaved += StructureView_SchemaSaved;
+            view.SchemaSaving += StructureView_SchemaSaving;
+            view.ConfirmBeforeSave = () => CanChangeTableStructure(profile, view.TableNode);
             MainTabs.Items.Add(tab);
             MainTabs.SelectedItem = tab;
-
-            try
-            {
-                IDatabaseMetadataProvider metadataProvider = DatabaseProviderRegistry.GetProvider(profile.ProviderType) as IDatabaseMetadataProvider;
-                DataTable table = await Task.Run(() => metadataProvider.LoadTableSchema(profile, node.Metadata));
-                grid.ItemsSource = table.DefaultView;
-                StatusText.Text = "已打开表结构：" + node.Name;
-            }
-            catch (System.Exception ex)
-            {
-                TXMessageBox.Show(this, ex.Message, "读取表结构失败", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await view.InitializeAsync(profile, node, isNew);
+            StatusText.Text = isNew ? "填写表名和字段后提交创建表。" : "已打开表结构：" + node.Name;
         }
 
         /// <summary>
@@ -1913,6 +2001,8 @@ namespace TXDB
             TXTabItem tab = sender as TXTabItem;
             if (tab != null)
             {
+                TableStructureTabView structure = tab.Content as TableStructureTabView;
+                if (structure != null && !structure.ConfirmClose()) { e.Handled = true; return; }
                 CleanupTab(tab);
                 MainTabs.Items.Remove(tab);
             }
@@ -2035,6 +2125,15 @@ namespace TXDB
         {
             if (tab == null)
             {
+                return;
+            }
+
+            TableStructureTabView structureView = tab.Content as TableStructureTabView;
+            if (structureView != null)
+            {
+                structureView.SchemaSaved -= StructureView_SchemaSaved;
+                structureView.SchemaSaving -= StructureView_SchemaSaving;
+                structureView.Cleanup();
                 return;
             }
 

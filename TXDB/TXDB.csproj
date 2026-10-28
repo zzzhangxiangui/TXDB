@@ -152,6 +152,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\TableStructureTabView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -159,6 +163,9 @@
     <Compile Include="Data\AccessDatabaseProvider.cs" />
     <Compile Include="Data\DatabaseProviderBase.cs" />
     <Compile Include="Data\DatabaseProviderRegistry.cs" />
+    <Compile Include="Data\TableSchemaEditor.cs" />
+    <Compile Include="Data\SqlDefinitionParser.cs" />
+    <Compile Include="Data\SqliteTableRebuilder.cs" />
     <Compile Include="Data\IDatabaseMetadataProvider.cs" />
     <Compile Include="Data\IDatabaseProvider.cs" />
     <Compile Include="Data\MySqlDatabaseProvider.cs" />
@@ -181,6 +188,7 @@
     <Compile Include="Models\SqlKeywordHelpInfo.cs" />
     <Compile Include="Models\SqlTemplateInfo.cs" />
     <Compile Include="Models\TableFilterCondition.cs" />
+    <Compile Include="Models\TableColumnDefinition.cs" />
     <Compile Include="Models\TableFilterOperatorOption.cs" />
     <Compile Include="Services\ConnectionProfileStore.cs" />
     <Compile Include="Services\NotifyObject.cs" />
@@ -222,6 +230,10 @@
     <Compile Include="Views\TablePageRequestedEventArgs.cs" />
     <Compile Include="Views\TablePreviewTabView.xaml.cs">
       <DependentUpon>TablePreviewTabView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\TableStructureTabView.xaml.cs">
+      <DependentUpon>TableStructureTabView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

@@ -381,7 +381,7 @@ namespace TXDB.Data
         }
 
         /// <summary>
-        /// 使用 Dapper 执行 SQL，并把动态行转换成 DataTable。
+        /// 使用 Dapper 执行 SQL，读取结果列和数据到 DataTable。
         /// </summary>
         public virtual QueryExecutionResult Execute(ConnectionProfile profile, string sql)
         {
@@ -397,9 +397,11 @@ namespace TXDB.Data
                 connection.Open();
                 if (IsQuerySql(sql))
                 {
-                    List<dynamic> rows = connection.Query(sql).ToList();
-                    result.Table = ConvertRowsToDataTable(rows);
-                    result.Message = "查询完成，返回 " + rows.Count + " 行。";
+                    using (IDataReader reader = connection.ExecuteReader(sql))
+                    {
+                        result.Table = ReadResultTable(reader);
+                    }
+                    result.Message = "查询完成，返回 " + result.Table.Rows.Count + " 行。";
                 }
                 else
                 {
@@ -453,8 +455,10 @@ namespace TXDB.Data
             {
                 connection.Open();
                 result.TotalRows = ReadTableTotalRows(connection, tableNode, filterSql.WhereClause, parameters);
-                List<dynamic> rows = connection.Query(BuildPreviewTableSql(tableNode, safePageIndex, safePageSize, filterSql.WhereClause), parameters).ToList();
-                result.Table = ConvertRowsToDataTable(rows);
+                using (IDataReader reader = connection.ExecuteReader(BuildPreviewTableSql(tableNode, safePageIndex, safePageSize, filterSql.WhereClause), parameters))
+                {
+                    result.Table = ReadResultTable(reader);
+                }
             }
 
             stopwatch.Stop();
@@ -1190,34 +1194,32 @@ namespace TXDB.Data
         }
 
         /// <summary>
-        /// 将 Dapper 动态行转换为 WPF DataGrid 可直接绑定的 DataTable。
+        /// 先读取列信息再读取记录，空结果也保留字段；不导入数据库约束，保持网格可新增和编辑。
         /// </summary>
-        protected static DataTable ConvertRowsToDataTable(IEnumerable<dynamic> rows)
+        protected static DataTable ReadResultTable(IDataReader reader)
         {
             DataTable table = new DataTable();
-            foreach (object row in rows)
+            for (int index = 0; index < reader.FieldCount; index++)
             {
-                IDictionary<string, object> values = row as IDictionary<string, object>;
-                if (values == null)
+                string name = reader.GetName(index);
+                if (string.IsNullOrWhiteSpace(name))
                 {
-                    continue;
+                    name = "Column" + (index + 1);
                 }
-
-                foreach (string columnName in values.Keys)
+                string uniqueName = name;
+                int suffix = 1;
+                while (table.Columns.Contains(uniqueName))
                 {
-                    if (!table.Columns.Contains(columnName))
-                    {
-                        table.Columns.Add(columnName, typeof(object));
-                    }
+                    uniqueName = name + "_" + suffix++;
                 }
+                table.Columns.Add(uniqueName, typeof(object));
+            }
 
-                DataRow dataRow = table.NewRow();
-                foreach (KeyValuePair<string, object> pair in values)
-                {
-                    dataRow[pair.Key] = pair.Value ?? DBNull.Value;
-                }
-
-                table.Rows.Add(dataRow);
+            while (reader.Read())
+            {
+                object[] values = new object[reader.FieldCount];
+                reader.GetValues(values);
+                table.Rows.Add(values);
             }
 
             return table;

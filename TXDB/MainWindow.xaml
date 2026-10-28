@@ -329,6 +329,8 @@
                             <MenuItem x:Name="OpenSavedQueryMenuItem" Header="打开查询" Click="OpenSavedQueryMenu_Click" />
                             <MenuItem x:Name="QueryTopRowsMenuItem" Header="打开表数据" Click="QueryTopRowsMenu_Click" />
                             <MenuItem x:Name="ViewStructureMenuItem" Header="查看表结构" Click="ViewStructureMenu_Click" />
+                            <MenuItem x:Name="NewTableMenuItem" Header="新建表" Click="NewTableMenu_Click" />
+                            <MenuItem x:Name="DropTableMenuItem" Header="删除表" Click="DropTableMenu_Click" />
                             <Separator x:Name="SavedQuerySeparator" />
                             <MenuItem x:Name="ImportQueriesMenuItem" Header="导入查询语句" Click="ImportQueriesMenu_Click" />
                             <MenuItem x:Name="ExportQueriesMenuItem" Header="导出查询语句" Click="ExportQueriesMenu_Click" />

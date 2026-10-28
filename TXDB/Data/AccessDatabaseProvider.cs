@@ -150,7 +150,8 @@ namespace TXDB.Data
                             Kind = DatabaseObjectKind.Column,
                             DatabaseName = databaseNode.Name,
                             ParentName = tableName,
-                            DataType = BuildAccessTypeName(columnRow)
+                            DataType = BuildAccessTypeName(columnRow),
+                            Comment = columnRow.Table.Columns.Contains("DESCRIPTION") ? columnRow["DESCRIPTION"].ToString() : string.Empty
                         });
                     }
 
@@ -191,7 +192,7 @@ namespace TXDB.Data
                     row["类型"] = BuildAccessTypeName(columnRow);
                     row["可空"] = columnRow.Table.Columns.Contains("IS_NULLABLE") ? columnRow["IS_NULLABLE"].ToString() : string.Empty;
                     row["默认值"] = columnRow.Table.Columns.Contains("COLUMN_DEFAULT") ? columnRow["COLUMN_DEFAULT"].ToString() : string.Empty;
-                    row["注释"] = string.Empty;
+                    row["注释"] = columnRow.Table.Columns.Contains("DESCRIPTION") ? columnRow["DESCRIPTION"].ToString() : string.Empty;
                     schemaTable.Rows.Add(row);
                 }
             }
@@ -521,7 +522,8 @@ namespace TXDB.Data
             HashSet<string> primaryKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             try
             {
-                DataTable primaryKeyTable = connection.GetSchema("Primary_Keys", new[] { null, null, tableName });
+                DataTable primaryKeyTable = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Primary_Keys, new object[] { null, null, tableName });
+                if (primaryKeyTable == null) return primaryKeys;
                 foreach (DataRow row in primaryKeyTable.Rows)
                 {
                     string columnName = row["COLUMN_NAME"].ToString();
