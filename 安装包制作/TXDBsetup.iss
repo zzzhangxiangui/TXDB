@@ -2,7 +2,7 @@
 ; 发布正式版本时只需要把 SourceRoot 改成 Release 输出目录即可。
 
 #define AppName "TXDB"
-#define AppVersion "1.0.0.1"
+#define AppVersion "1.0.0.2"
 #define SourceRoot "..\TXDB\bin\Debug"
 
 [Setup]

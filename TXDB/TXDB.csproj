@@ -187,6 +187,7 @@
     <Compile Include="Services\AppSettingsStore.cs" />
     <Compile Include="Services\AppStoragePaths.cs" />
     <Compile Include="Services\SavedQueryStore.cs" />
+    <Compile Include="Services\ResultExportHelper.cs" />
     <Compile Include="Services\SqlCompletionService.cs" />
     <Compile Include="Services\SqlHelperCatalog.cs" />
     <Compile Include="Views\ConnectionDialog.xaml.cs">

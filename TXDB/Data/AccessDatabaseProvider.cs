@@ -150,7 +150,7 @@ namespace TXDB.Data
                             Kind = DatabaseObjectKind.Column,
                             DatabaseName = databaseNode.Name,
                             ParentName = tableName,
-                            DataType = columnRow["DATA_TYPE"].ToString()
+                            DataType = BuildAccessTypeName(columnRow)
                         });
                     }
 
@@ -188,7 +188,7 @@ namespace TXDB.Data
                     row["序号"] = index++;
                     row["字段名"] = columnRow["COLUMN_NAME"].ToString();
                     row["主键"] = primaryKeys.Contains(columnRow["COLUMN_NAME"].ToString()) ? "是" : string.Empty;
-                    row["类型"] = columnRow["DATA_TYPE"].ToString();
+                    row["类型"] = BuildAccessTypeName(columnRow);
                     row["可空"] = columnRow.Table.Columns.Contains("IS_NULLABLE") ? columnRow["IS_NULLABLE"].ToString() : string.Empty;
                     row["默认值"] = columnRow.Table.Columns.Contains("COLUMN_DEFAULT") ? columnRow["COLUMN_DEFAULT"].ToString() : string.Empty;
                     row["注释"] = string.Empty;
@@ -197,6 +197,81 @@ namespace TXDB.Data
             }
 
             return schemaTable;
+        }
+
+        /// <summary>
+        /// 将 OleDb 字段类型编号转换为 Access 中可读的类型名称。
+        /// </summary>
+        private static string BuildAccessTypeName(DataRow columnRow)
+        {
+            long? typeCode = ReadSchemaInteger(columnRow, "DATA_TYPE");
+            long? length = ReadSchemaInteger(columnRow, "CHARACTER_MAXIMUM_LENGTH");
+            long flags = ReadSchemaInteger(columnRow, "COLUMN_FLAGS") ?? 0;
+            // DBCOLUMNFLAGS_ISLONG 表示长文本或长二进制字段。
+            bool isLong = (flags & 0x80) != 0;
+            switch (typeCode)
+            {
+                case 2: return "整型";
+                case 3: return "长整型";
+                case 4: return "单精度浮点型";
+                case 5: return "双精度浮点型";
+                case 6: return "货币";
+                case 7:
+                case 64:
+                case 135: return "日期/时间";
+                case 11: return "是/否";
+                case 16: return "有符号字节";
+                case 17: return "字节";
+                case 18: return "无符号整型";
+                case 19: return "无符号长整型";
+                case 20: return "大整数";
+                case 21: return "无符号大整数";
+                case 72: return "GUID";
+                case 14:
+                case 131:
+                case 139:
+                    long? precision = ReadSchemaInteger(columnRow, "NUMERIC_PRECISION");
+                    long? scale = ReadSchemaInteger(columnRow, "NUMERIC_SCALE");
+                    return precision > 0 && scale >= 0
+                        ? "十进制数(" + precision.Value + "," + scale.Value + ")"
+                        : "十进制数";
+                case 8:
+                case 129:
+                case 130:
+                case 200:
+                case 202:
+                    if (isLong || length > 255)
+                    {
+                        return "长文本";
+                    }
+
+                    return length > 0 ? "短文本(" + length.Value + ")" : "短文本";
+                case 201:
+                case 203: return "长文本";
+                case 128:
+                case 204:
+                    return isLong ? "OLE 对象" : (length > 0 ? "二进制(" + length.Value + ")" : "二进制");
+                case 205: return "OLE 对象";
+                case 133: return "日期";
+                case 134: return "时间";
+                case 12: return "变体";
+                default:
+                    return typeCode.HasValue ? "未知类型(" + typeCode.Value + ")" : string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 兼容不同 Access 驱动缺少或未填写的字段元数据。
+        /// </summary>
+        private static long? ReadSchemaInteger(DataRow row, string columnName)
+        {
+            if (!row.Table.Columns.Contains(columnName) || row.IsNull(columnName))
+            {
+                return null;
+            }
+
+            long value;
+            return long.TryParse(row[columnName].ToString(), out value) ? value : (long?)null;
         }
 
         /// <summary>

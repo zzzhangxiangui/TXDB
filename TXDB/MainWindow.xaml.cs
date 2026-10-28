@@ -280,7 +280,7 @@ namespace TXDB
 
             TextBlock welcomeText = new TextBlock
             {
-                Text = "新建连接后，可在左侧双击连接加载数据库列表；双击数据库加载表；双击表打开分页数据预览；右键表可查看结构；查询结果支持导出 CSV。",
+                Text = "新建连接后，可在左侧双击连接加载数据库列表；双击数据库加载表；双击表打开分页数据预览；右键表可查看结构；查询结果支持导出 CSV、TXT。",
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 16
             };

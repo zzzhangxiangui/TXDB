@@ -132,6 +132,7 @@ namespace TXDB.Views
         private static DataTemplate CreateReadOnlySelectableCellTemplate(string columnName)
         {
             FrameworkElementFactory textBox = new FrameworkElementFactory(typeof(TextBox));
+            textBox.Name = "CellText";
             textBox.SetBinding(TextBox.TextProperty, CreateCellBinding(columnName));
             textBox.SetValue(TextBox.IsReadOnlyProperty, true);
             textBox.SetValue(TextBox.IsReadOnlyCaretVisibleProperty, true);
@@ -143,7 +144,18 @@ namespace TXDB.Views
             textBox.SetValue(TextBox.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
             textBox.SetValue(TextBox.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
 
-            return new DataTemplate { VisualTree = textBox };
+            DataTemplate template = new DataTemplate { VisualTree = textBox };
+            DataTrigger selectedTrigger = new DataTrigger
+            {
+                Binding = new Binding("IsSelected")
+                {
+                    RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridCell), 1)
+                },
+                Value = true
+            };
+            selectedTrigger.Setters.Add(new Setter(TextBox.ForegroundProperty, Brushes.White, "CellText"));
+            template.Triggers.Add(selectedTrigger);
+            return template;
         }
 
         private static Style CreateQueryResultTextElementStyle()

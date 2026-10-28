@@ -114,6 +114,11 @@ namespace TXDB.Data
                 }
             }
 
+            // 无主键时使用原始字段值定位，不能使用用户刚编辑后的值。
+            IList<string> matchColumns = primaryKeys.Count > 0
+                ? primaryKeys
+                : GetOriginalValueMatchColumns(changes, schema);
+
             ConnectionProfile writeProfile = profile.Clone();
             if ((ProviderType == DatabaseProviderType.SqlServer || ProviderType == DatabaseProviderType.MySQL) &&
                 !string.IsNullOrWhiteSpace(tableNode.DatabaseName))
@@ -137,21 +142,11 @@ namespace TXDB.Data
                             }
                             else if (row.RowState == DataRowState.Modified)
                             {
-                                if (primaryKeys.Count == 0)
-                                {
-                                    throw new InvalidOperationException("该表没有主键，无法安全修改数据行。");
-                                }
-
-                                affectedRows += UpdateChangedRow(connection, transaction, tableNode, row, primaryKeys);
+                                affectedRows += UpdateChangedRow(connection, transaction, tableNode, row, matchColumns, primaryKeys.Count == 0);
                             }
                             else if (row.RowState == DataRowState.Deleted)
                             {
-                                if (primaryKeys.Count == 0)
-                                {
-                                    throw new InvalidOperationException("该表没有主键，无法安全删除数据行。");
-                                }
-
-                                affectedRows += DeleteChangedRow(connection, transaction, tableNode, row, primaryKeys);
+                                affectedRows += DeleteChangedRow(connection, transaction, tableNode, row, matchColumns, primaryKeys.Count == 0);
                             }
                         }
 
@@ -185,7 +180,7 @@ namespace TXDB.Data
             return ExecuteTableChange(connection, transaction, sql, values);
         }
 
-        private int UpdateChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> primaryKeys)
+        private int UpdateChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> matchColumns, bool matchOriginalValues)
         {
             List<DataColumn> modifiedColumns = row.Table.Columns.Cast<DataColumn>()
                 .Where(column => !ValuesEqual(row[column, DataRowVersion.Original], row[column, DataRowVersion.Current]))
@@ -193,6 +188,11 @@ namespace TXDB.Data
             if (modifiedColumns.Count == 0)
             {
                 return 0;
+            }
+
+            if (matchOriginalValues)
+            {
+                EnsureOriginalRowIsUnique(connection, transaction, tableNode, row, matchColumns);
             }
 
             List<object> values = new List<object>();
@@ -203,27 +203,91 @@ namespace TXDB.Data
                 values.Add(row[column, DataRowVersion.Current]);
             }
 
-            string whereClause = BuildPrimaryKeyWhere(row, primaryKeys, DataRowVersion.Original, values);
+            string whereClause = BuildRowMatchWhere(row, matchColumns, DataRowVersion.Original, values);
             int affected = ExecuteTableChange(connection, transaction,
                 "UPDATE " + QuoteTableName(tableNode) + " SET " + string.Join(", ", assignments.ToArray()) + " WHERE " + whereClause, values);
             EnsureSingleRowChanged(affected);
             return affected;
         }
 
-        private int DeleteChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> primaryKeys)
+        private int DeleteChangedRow(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> matchColumns, bool matchOriginalValues)
         {
+            if (matchOriginalValues)
+            {
+                EnsureOriginalRowIsUnique(connection, transaction, tableNode, row, matchColumns);
+            }
+
             List<object> values = new List<object>();
-            string whereClause = BuildPrimaryKeyWhere(row, primaryKeys, DataRowVersion.Original, values);
+            string whereClause = BuildRowMatchWhere(row, matchColumns, DataRowVersion.Original, values);
             int affected = ExecuteTableChange(connection, transaction,
                 "DELETE FROM " + QuoteTableName(tableNode) + " WHERE " + whereClause, values);
             EnsureSingleRowChanged(affected);
             return affected;
         }
 
-        private string BuildPrimaryKeyWhere(DataRow row, IList<string> primaryKeys, DataRowVersion version, IList<object> values)
+        /// <summary>
+        /// 大对象等不支持等值比较的字段不参与定位；剩余条件仍须在数据库中唯一匹配。
+        /// </summary>
+        private IList<string> GetOriginalValueMatchColumns(DataTable changes, DataTable schema)
         {
+            List<string> columns = new List<string>();
+            foreach (DataColumn column in changes.Columns)
+            {
+                string typeName = schema.Rows.Cast<DataRow>()
+                    .Where(row => SameName(Convert.ToString(row["字段名"]), column.ColumnName))
+                    .Select(row => Convert.ToString(row["类型"]).ToLowerInvariant())
+                    .FirstOrDefault() ?? string.Empty;
+                if (ProviderType == DatabaseProviderType.Access &&
+                    (column.DataType == typeof(byte[]) || typeName == "ole 对象"))
+                {
+                    continue;
+                }
+
+                if (ProviderType == DatabaseProviderType.SqlServer &&
+                    (typeName == "text" || typeName == "ntext" || typeName == "image" || typeName == "xml"))
+                {
+                    continue;
+                }
+
+                if (ProviderType == DatabaseProviderType.Oracle &&
+                    (typeName.StartsWith("clob") || typeName.StartsWith("nclob") || typeName.StartsWith("blob") ||
+                     typeName == "long" || typeName.StartsWith("long raw") || typeName.StartsWith("xmltype")))
+                {
+                    continue;
+                }
+
+                columns.Add(column.ColumnName);
+            }
+
+            return columns;
+        }
+
+        private void EnsureOriginalRowIsUnique(IDbConnection connection, IDbTransaction transaction, DatabaseObjectNode tableNode, DataRow row, IList<string> matchColumns)
+        {
+            List<object> values = new List<object>();
+            string whereClause = BuildRowMatchWhere(row, matchColumns, DataRowVersion.Original, values);
+            using (IDbCommand command = CreateTableChangeCommand(connection, transaction,
+                "SELECT COUNT(*) FROM " + QuoteTableName(tableNode) + " WHERE " + whereClause, values))
+            {
+                long count = Convert.ToInt64(command.ExecuteScalar());
+                if (count != 1)
+                {
+                    throw new InvalidOperationException(count == 0
+                        ? "数据行已被其他操作修改或删除，请刷新后重试。"
+                        : "该表没有主键，原始字段值匹配到多行，无法唯一定位当前行。本次更改已取消，请为表添加主键或唯一标识后重试。");
+                }
+            }
+        }
+
+        private string BuildRowMatchWhere(DataRow row, IList<string> matchColumns, DataRowVersion version, IList<object> values)
+        {
+            if (matchColumns.Count == 0)
+            {
+                throw new InvalidOperationException("该表没有主键，也没有可用于定位的普通字段，无法安全修改或删除数据行。");
+            }
+
             List<string> conditions = new List<string>();
-            foreach (string key in primaryKeys)
+            foreach (string key in matchColumns)
             {
                 if (!row.Table.Columns.Contains(key))
                 {
@@ -247,20 +311,26 @@ namespace TXDB.Data
 
         private int ExecuteTableChange(IDbConnection connection, IDbTransaction transaction, string sql, IList<object> values)
         {
-            using (IDbCommand command = connection.CreateCommand())
+            using (IDbCommand command = CreateTableChangeCommand(connection, transaction, sql, values))
             {
-                command.Transaction = transaction;
-                command.CommandText = sql;
-                for (int index = 0; index < values.Count; index++)
-                {
-                    IDbDataParameter parameter = command.CreateParameter();
-                    parameter.ParameterName = "p" + index;
-                    parameter.Value = values[index] ?? DBNull.Value;
-                    command.Parameters.Add(parameter);
-                }
-
                 return command.ExecuteNonQuery();
             }
+        }
+
+        private IDbCommand CreateTableChangeCommand(IDbConnection connection, IDbTransaction transaction, string sql, IList<object> values)
+        {
+            IDbCommand command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = sql;
+            for (int index = 0; index < values.Count; index++)
+            {
+                IDbDataParameter parameter = command.CreateParameter();
+                parameter.ParameterName = "p" + index;
+                parameter.Value = values[index] ?? DBNull.Value;
+                command.Parameters.Add(parameter);
+            }
+
+            return command;
         }
 
         private string BuildWriteParameterList(int count)
@@ -295,7 +365,7 @@ namespace TXDB.Data
             {
                 throw new InvalidOperationException(affectedRows == 0
                     ? "数据行已被其他操作修改或删除，请刷新后重试。"
-                    : "主键条件匹配到多行，事务已取消以避免误改数据。");
+                    : "定位条件匹配到多行，事务已取消以避免误改数据。");
             }
         }
 

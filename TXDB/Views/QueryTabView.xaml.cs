@@ -176,14 +176,16 @@ namespace TXDB.Views
 
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Title = "导出查询结果";
-            dialog.Filter = "CSV 文件 (*.csv)|*.csv|所有文件 (*.*)|*.*";
-            dialog.FileName = "query-result.csv";
+            dialog.Filter = ResultExportHelper.FileFilter;
+            dialog.DefaultExt = ".csv";
+            dialog.AddExtension = true;
+            dialog.FileName = "query-result";
             if (dialog.ShowDialog(Window.GetWindow(this)) != true)
             {
                 return;
             }
 
-            ExportCsv(dialog.FileName);
+            ResultExportHelper.Export(resultTable.DefaultView, dialog.FileName, dialog.FilterIndex);
             MessageText.Text = "已导出：" + dialog.FileName;
         }
 
@@ -827,61 +829,6 @@ namespace TXDB.Views
             return text;
         }
 
-        /// <summary>
-        /// 将当前结果集导出为 CSV 文件。
-        /// </summary>
-        private void ExportCsv(string fileName)
-        {
-            DataView view = resultTable == null ? null : resultTable.DefaultView;
-            if (view == null)
-            {
-                return;
-            }
-
-            using (StreamWriter writer = new StreamWriter(fileName, false, new UTF8Encoding(true)))
-            {
-                for (int index = 0; index < resultTable.Columns.Count; index++)
-                {
-                    if (index > 0)
-                    {
-                        writer.Write(",");
-                    }
-
-                    writer.Write(ToCsvCell(resultTable.Columns[index].ColumnName));
-                }
-
-                writer.WriteLine();
-
-                foreach (DataRowView rowView in view)
-                {
-                    for (int index = 0; index < resultTable.Columns.Count; index++)
-                    {
-                        if (index > 0)
-                        {
-                            writer.Write(",");
-                        }
-
-                        writer.Write(ToCsvCell(Convert.ToString(rowView[index])));
-                    }
-
-                    writer.WriteLine();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 转义单个 CSV 单元格。
-        /// </summary>
-        private static string ToCsvCell(string value)
-        {
-            string text = value ?? string.Empty;
-            if (text.Contains("\"") || text.Contains(",") || text.Contains("\r") || text.Contains("\n"))
-            {
-                return "\"" + text.Replace("\"", "\"\"") + "\"";
-            }
-
-            return text;
-        }
 
         /// <summary>
         /// 刷新当前结果表格选中行和总行数提示。
